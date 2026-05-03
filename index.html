@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDW DLC — Premium Minecraft Mod</title>
+    <meta name="description" content="Самый мощный Minecraft мод на рынке">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #5865f2;
+            --secondary: #8b5cf6;
+            --dark: #0b0f19;
+            --darker: #070a12;
+            --card: #11182a;
+            --text: #ffffff;
+            --text-secondary: #8b92a8;
+            --accent: #64c8ff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(11, 15, 25, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(100, 200, 255, 0.1);
+        }
+        
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.4);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(88, 101, 242, 0.1) 0%, transparent 50%);
+        }
+        
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h1 {
+            font-size: 80px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+        
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 24px;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-large {
+            padding: 18px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+        }
+        
+        .btn-secondary {
+            background: rgba(100, 200, 255, 0.1);
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 16px 38px;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(100, 200, 255, 0.2);
+        }
+        
+        /* Features Section */
+        .section {
+            padding: 120px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 80px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--card);
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(100, 200, 255, 0.3);
+        }
+        
+        .feature-number {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        /* Benefits Grid */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .benefit-card {
+            background: var(--card);
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .benefit-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .benefit-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .benefit-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* Download Section */
+        .download-section {
+            background: var(--card);
+            border-radius: 30px;
+            padding: 80px 60px;
+            text-align: center;
+            border: 1px solid rgba(100, 200, 255, 0.2);
+        }
+        
+        .download-form {
+            max-width: 600px;
+            margin: 40px auto 0;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(11, 15, 25, 0.9);
+            border: 2px solid rgba(100, 200, 255, 0.3);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 16px;
+            font-family: 'Consolas', monospace;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.3);
+        }
+        
+        .download-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        
+        .status {
+            margin-top: 25px;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 2px solid rgba(34, 197, 94, 0.5);
+            color: #4ade80;
+        }
+        
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid rgba(239, 68, 68, 0.5);
+            color: #f87171;
+        }
+        
+        .status.info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            color: #60a5fa;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(11, 15, 25, 0.9);
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--darker);
+            padding: 60px 40px 30px;
+            border-top: 1px solid rgba(100, 200, 255, 0.1);
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-brand h3 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+        
+        .footer-brand p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .footer-links h4 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid rgba(100, 200, 255, 0.1);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 48px;
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+            }
+            
+            .section-title {
+                font-size: 36px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            nav {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">MDW DLC</div>
+            <div class="nav-links">
+                <a href="#features">Возможности</a>
+                <a href="#download">Скачать</a>
+                <a href="#support">Поддержка</a>
+                <a href="#download" class="btn-primary">Получить мод</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>
+                <span class="gradient-text">MDW DLC</span> — простой путь<br>к победе
+            </h1>
+            <p class="hero-subtitle">
+                Мощный клиент, который не только улучшает ваши игровые навыки, но и позволяет доминировать на любом сервере Minecraft благодаря продвинутым функциям
+            </p>
+            <div class="hero-buttons">
+                <a href="#download" class="btn-primary btn-large">Скачать мод</a>
+                <a href="#support" class="btn-secondary btn-large">Поддержка</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <h2 class="section-title">Почему MDW DLC?</h2>
+        <p class="section-subtitle">Мы предоставляем только лучшие функции</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-number">01</div>
+                <h3>Лучшие байпасы на всём рынке</h3>
+                <p>Огромное количество и качество встроенных байпасов точно не оставят вас равнодушными</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-number">02</div>
+                <h3>Обилие боевых функций</h3>
+                <p>Мы предоставляем огромную кастомизацию боевых функций, и мы уверены, что с нами вы никогда не проиграете</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-number">03</div>
+                <h3>Красивый и удобный интерфейс</h3>
+                <p>Никаких сложностей и бесконечных поисков функций, мы продумали всё за вас</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="section">
+        <h2 class="section-title">Моментальная настройка</h2>
+        
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">☁️</div>
+                <h3>Облачные конфиги</h3>
+                <p>Делитесь конфигурациями с другими, заимствуйте конфиги других игроков. Самая удобная система конфигов</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">🔧</div>
+                <h3>Fabric API</h3>
+                <p>MDW DLC разработан на базе Fabric API, что открывает широкие возможности для кастомизации клиента модами</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">⌨️</div>
+                <h3>Детальная система биндов</h3>
+                <p>Наша система клавиш позволяет создать своё «пианино». Переключайте настройки, не отрываясь от игры</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">💬</div>
+                <h3>Встроенный чат</h3>
+                <p>Общайтесь с пользователями, обменивайтесь информацией, находите команды. Всегда приятно иметь собеседника</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">🛠️</div>
+                <h3>Качественная техподдержка</h3>
+                <p>Вы можете рассчитывать на быструю и качественную поддержку. Наша команда всегда готова помочь</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">⚡</div>
+                <h3>Точная оптимизация</h3>
+                <p>Клиент MDW DLC работает без лагов даже на слабых системах, обеспечивая плавную и комфортную игру</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="section" id="download">
+        <div class="download-section">
+            <h2 class="section-title">Играй по-другому с MDW DLC</h2>
+            <p class="section-subtitle">Попробовав наш клиент, мы можем с уверенностью сказать, что вы больше не подумаете о покупке другого продукта</p>
+            
+            <div class="download-form">
+                <div class="form-group">
+                    <label for="licenseKey">🔑 Лицензионный ключ</label>
+                    <input 
+                        type="text" 
+                        id="licenseKey" 
+                        placeholder="MDW-XXXXXX-XXXXXX-XXXXXX"
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                </div>
+                
+                <button class="btn-primary download-btn" onclick="downloadMod()">
+                    ⬇️ Скачать мод
+                </button>
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div id="status" class="status"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="support">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3 class="gradient-text">MDW DLC</h3>
+                <p>Самый мощный Minecraft клиент на рынке. Разработан с любовью для игроков, которые хотят большего.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Продукт</h4>
+                <ul>
+                    <li><a href="#download">Скачать</a></li>
+                    <li><a href="#features">Возможности</a></li>
+                    <li><a href="#support">Поддержка</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Документы</h4>
+                <ul>
+                    <li><a href="#">Пользовательское соглашение</a></li>
+                    <li><a href="#">Политика конфиденциальности</a></li>
+                    <li><a href="#">Инструкция по установке</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2026 – MDW DLC. Все права защищены.</p>
+            <p style="margin-top: 10px;">Minecraft 1.21.4 • Fabric Loader 0.16.14</p>
+        </div>
+    </footer>
+
+    <script>
+        // Generate HWID
+        async function generateHWID() {
+            const data = [
+                navigator.userAgent,
+                navigator.language,
+                navigator.platform,
+                navigator.hardwareConcurrency || 'unknown',
+                screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+                new Date().getTimezoneOffset(),
+                navigator.deviceMemory || 'unknown',
+                navigator.maxTouchPoints || 0
+            ].join('|');
+            
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(data);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+        
+        async function downloadMod() {
+            const licenseKey = document.getElementById('licenseKey').value.trim();
+            const statusDiv = document.getElementById('status');
+            const downloadBtn = document.querySelector('.download-btn');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (!licenseKey) {
+                showStatus('⚠️ Пожалуйста, введите лицензионный ключ', 'error');
+                return;
+            }
+            
+            if (!licenseKey.match(/^MDW-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/i)) {
+                showStatus('⚠️ Неверный формат ключа', 'error');
+                return;
+            }
+            
+            downloadBtn.disabled = true;
+            progressBar.style.display = 'block';
+            
+            try {
+                showStatus('🔐 Генерация HWID...', 'info');
+                progressFill.style.width = '20%';
+                await sleep(500);
+                
+                const hwid = await generateHWID();
+                
+                showStatus('✅ Проверка лицензии...', 'info');
+                progressFill.style.width = '40%';
+                await sleep(500);
+                
+                showStatus('📦 Загрузка мода...', 'info');
+                progressFill.style.width = '60%';
+                
+                const response = await fetch('https://license-production-d47b.up.railway.app/api/download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        key: licenseKey,
+                        hwid: hwid
+                    })
+                });
+                
+                progressFill.style.width = '80%';
+                
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.reason || 'Ошибка загрузки. Проверьте ключ.');
+                }
+                
+                showStatus('💾 Сохранение файла...', 'info');
+                progressFill.style.width = '90%';
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'mdwdlc.jar';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                progressFill.style.width = '100%';
+                await sleep(500);
+                
+                showStatus('✅ Загрузка завершена! Проверьте папку загрузок.', 'success');
+                
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                showStatus('❌ Ошибка: ' + error.message, 'error');
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            } finally {
+                downloadBtn.disabled = false;
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Enter key support
+        document.getElementById('licenseKey').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                downloadMod();
+            }
+        });
+        
+        // Auto-format key
+        document.getElementById('licenseKey').addEventListener('input', function(e) {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+            e.target.value = value;
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
