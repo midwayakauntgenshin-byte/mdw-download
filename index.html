@@ -631,11 +631,11 @@
                     
                     <p style="margin-top: 15px; text-align: center;">🚀 <strong>Как установить:</strong></p>
                     <ol style="padding-left: 20px; color: var(--text-secondary); max-width: 500px; margin: 10px auto;">
-                        <li>Скачай <span style="color: var(--accent);">MDWLauncher-Starter.exe</span></li>
+                        <li>Скачай <span style="color: var(--accent);">MDWLauncher-Installer.exe</span></li>
                         <li>Запусти файл (если Windows спросит - нажми "Выполнить в любом случае")</li>
+                        <li>Лаунчер автоматически скачает всё необходимое</li>
                         <li>Введи лицензионный ключ</li>
-                        <li>Нажми "Download & Install"</li>
-                        <li>Нажми "Launch Game"</li>
+                        <li>Нажми "Download & Install" и "Launch Game"</li>
                     </ol>
                     <p style="margin-top: 15px; font-size: 13px; color: var(--text-secondary); text-align: center;">
                         💡 Лаунчер автоматически скачает Java, Minecraft, Fabric и мод
@@ -811,7 +811,7 @@
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'MDWLauncher-Starter.exe';
+                link.download = 'MDWLauncher-Installer.exe';
                 document.body.appendChild(link);
                 link.click();
                 window.URL.revokeObjectURL(url);
@@ -820,7 +820,7 @@
                 progressFill.style.width = '100%';
                 await sleep(500);
                 
-                showStatus('✅ Загрузка завершена! Запусти MDWLauncher-Starter.exe', 'success');
+                showStatus('✅ Загрузка завершена! Запусти MDWLauncher-Installer.exe', 'success');
                 
                 setTimeout(() => {
                     progressBar.style.display = 'none';
