@@ -89,6 +89,44 @@
             pointer-events: none;
         }
 
+        .energy-ribbons {
+            position: absolute;
+            inset: -18% -12%;
+            overflow: hidden;
+            opacity: 0.7;
+            mix-blend-mode: screen;
+        }
+
+        .energy-ribbons span {
+            position: absolute;
+            left: -18%;
+            width: 140%;
+            height: 2px;
+            border-radius: 99px;
+            background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.04), rgba(82, 215, 255, 0.55), rgba(255, 95, 143, 0.35), transparent);
+            filter: drop-shadow(0 0 16px rgba(82, 215, 255, 0.35));
+            transform: rotate(-18deg) translateX(-18%);
+            animation: ribbonDrift 7.4s ease-in-out infinite;
+        }
+
+        .energy-ribbons span:nth-child(1) {
+            top: 24%;
+        }
+
+        .energy-ribbons span:nth-child(2) {
+            top: 53%;
+            animation-delay: -2.3s;
+            animation-duration: 8.8s;
+            background: linear-gradient(90deg, transparent, rgba(67, 240, 177, 0.03), rgba(67, 240, 177, 0.44), rgba(139, 115, 255, 0.34), transparent);
+        }
+
+        .energy-ribbons span:nth-child(3) {
+            top: 78%;
+            animation-delay: -4.8s;
+            animation-duration: 10.2s;
+            background: linear-gradient(90deg, transparent, rgba(255, 200, 90, 0.03), rgba(255, 95, 143, 0.42), rgba(82, 215, 255, 0.32), transparent);
+        }
+
         #networkCanvas {
             width: 100%;
             height: 100%;
@@ -213,6 +251,15 @@
             background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.42), rgba(255, 95, 143, 0.25), transparent);
         }
 
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 76px 0 auto;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.2), transparent);
+            animation: horizonPulse 4s ease-in-out infinite;
+        }
+
         .hero-asset {
             position: absolute;
             inset: 112px max(28px, calc((100vw - 1180px) / 2)) auto auto;
@@ -279,7 +326,9 @@
             height: 2px;
             border-radius: 99px;
             background: linear-gradient(90deg, transparent, var(--cyan), var(--mint), transparent);
+            background-size: 240% 100%;
             opacity: 0.78;
+            animation: linePulse 3.4s ease-in-out infinite;
         }
 
         .map-line.one {
@@ -295,6 +344,8 @@
             top: 62%;
             transform: rotate(12deg);
             background: linear-gradient(90deg, transparent, var(--rose), var(--amber), transparent);
+            background-size: 240% 100%;
+            animation-delay: -1.2s;
         }
 
         .map-line.three {
@@ -302,6 +353,7 @@
             right: 34%;
             top: 78%;
             transform: rotate(-15deg);
+            animation-delay: -2s;
         }
 
         .hero-content {
@@ -343,12 +395,93 @@
             letter-spacing: 0;
         }
 
+        .glitch-title {
+            position: relative;
+            width: fit-content;
+        }
+
+        .glitch-title::before,
+        .glitch-title::after {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .glitch-title::before {
+            color: rgba(82, 215, 255, 0.5);
+            transform: translate(3px, -2px);
+            clip-path: inset(0 0 58% 0);
+            animation: titleGlitch 6.8s steps(1, end) infinite;
+        }
+
+        .glitch-title::after {
+            color: rgba(255, 95, 143, 0.42);
+            transform: translate(-3px, 2px);
+            clip-path: inset(54% 0 0 0);
+            animation: titleGlitch 7.3s steps(1, end) infinite reverse;
+        }
+
         .text-gradient {
             display: inline-block;
             background: linear-gradient(100deg, var(--text), var(--cyan) 48%, var(--rose));
+            background-size: 220% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            animation: titleFlow 4.8s ease-in-out infinite;
+        }
+
+        .hero-chips {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero-chip {
+            position: absolute;
+            min-height: 30px;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0 10px;
+            background: rgba(8, 12, 22, 0.5);
+            color: rgba(244, 247, 251, 0.68);
+            font-size: 12px;
+            font-weight: 850;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
+            animation: chipFloat 6.4s ease-in-out infinite;
+        }
+
+        .hero-chip:nth-child(1) {
+            top: 18%;
+            left: 5%;
+            color: var(--mint);
+        }
+
+        .hero-chip:nth-child(2) {
+            top: 29%;
+            right: 12%;
+            color: var(--cyan);
+            animation-delay: -1.5s;
+        }
+
+        .hero-chip:nth-child(3) {
+            left: 50%;
+            bottom: 36%;
+            color: var(--amber);
+            animation-delay: -3s;
+        }
+
+        .hero-chip:nth-child(4) {
+            right: 5%;
+            bottom: 30%;
+            color: var(--rose);
+            animation-delay: -4.5s;
         }
 
         .hero-subtitle {
@@ -382,6 +515,20 @@
             color: var(--text);
             font-weight: 800;
             transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(130px circle at var(--btn-x, 50%) var(--btn-y, 50%), rgba(255, 255, 255, 0.22), transparent 62%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 180ms ease;
+        }
+
+        .btn:hover::before {
+            opacity: 1;
         }
 
         .btn:disabled {
@@ -478,8 +625,31 @@
         .stat {
             min-width: 0;
             min-height: 92px;
+            position: relative;
+            overflow: hidden;
             padding: 18px;
             background: rgba(13, 17, 29, 0.82);
+        }
+
+        .stat::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(115deg, transparent 0 36%, rgba(82, 215, 255, 0.08) 46%, transparent 58%);
+            transform: translateX(-100%);
+            animation: statSweep 6s ease-in-out infinite;
+        }
+
+        .stat:nth-child(2)::before {
+            animation-delay: -1s;
+        }
+
+        .stat:nth-child(3)::before {
+            animation-delay: -2s;
+        }
+
+        .stat:nth-child(4)::before {
+            animation-delay: -3s;
         }
 
         .stat strong {
@@ -548,6 +718,7 @@
             padding: 26px;
             background: var(--panel);
             box-shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
+            animation: cardBreathe 8s ease-in-out infinite;
         }
 
         .feature-card::before {
@@ -566,6 +737,14 @@
 
         .feature-card:nth-child(3)::before {
             background: linear-gradient(90deg, var(--mint), var(--cyan), var(--amber));
+        }
+
+        .feature-card:nth-child(2) {
+            animation-delay: -1.5s;
+        }
+
+        .feature-card:nth-child(3) {
+            animation-delay: -3s;
         }
 
         .feature-index {
@@ -608,6 +787,26 @@
             border-radius: 8px;
             background: var(--panel-strong);
             box-shadow: var(--shadow);
+        }
+
+        .download-panel::before,
+        .community-card::before,
+        .support-band::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(120deg, rgba(82, 215, 255, 0.62), rgba(67, 240, 177, 0), rgba(255, 95, 143, 0.58), rgba(255, 200, 90, 0));
+            background-size: 260% 260%;
+            opacity: 0.32;
+            pointer-events: none;
+            animation: borderOrbit 6.8s linear infinite;
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
         }
 
         .download-panel {
@@ -705,6 +904,142 @@
             50% {
                 transform: translateY(-3px);
                 border-color: rgba(82, 215, 255, 0.44);
+            }
+        }
+
+        @keyframes ribbonDrift {
+            0%, 100% {
+                transform: rotate(-18deg) translateX(-22%);
+                opacity: 0;
+            }
+
+            16%, 78% {
+                opacity: 1;
+            }
+
+            58% {
+                transform: rotate(-18deg) translateX(10%);
+            }
+        }
+
+        @keyframes horizonPulse {
+            0%, 100% {
+                opacity: 0.18;
+                transform: scaleX(0.58);
+            }
+
+            50% {
+                opacity: 0.62;
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes linePulse {
+            0%, 100% {
+                background-position: 0% 50%;
+                opacity: 0.42;
+                filter: drop-shadow(0 0 4px rgba(82, 215, 255, 0.18));
+            }
+
+            50% {
+                background-position: 100% 50%;
+                opacity: 0.95;
+                filter: drop-shadow(0 0 14px rgba(82, 215, 255, 0.5));
+            }
+        }
+
+        @keyframes titleFlow {
+            0%, 100% {
+                background-position: 0% 50%;
+                filter: drop-shadow(0 0 0 rgba(82, 215, 255, 0));
+            }
+
+            50% {
+                background-position: 100% 50%;
+                filter: drop-shadow(0 0 24px rgba(82, 215, 255, 0.22));
+            }
+        }
+
+        @keyframes titleGlitch {
+            0%, 84%, 100% {
+                opacity: 0;
+                transform: translate(0, 0);
+            }
+
+            85% {
+                opacity: 0.65;
+                transform: translate(5px, -2px);
+            }
+
+            86% {
+                opacity: 0;
+                transform: translate(-4px, 3px);
+            }
+
+            89% {
+                opacity: 0.48;
+                transform: translate(-3px, 2px);
+            }
+
+            90% {
+                opacity: 0;
+                transform: translate(0, 0);
+            }
+        }
+
+        @keyframes chipFloat {
+            0%, 100% {
+                transform: translate3d(0, 0, 0) rotate(0deg);
+                opacity: 0.44;
+            }
+
+            50% {
+                transform: translate3d(12px, -18px, 0) rotate(1.5deg);
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes statSweep {
+            0%, 60%, 100% {
+                transform: translateX(-120%);
+            }
+
+            78% {
+                transform: translateX(120%);
+            }
+        }
+
+        @keyframes cardBreathe {
+            0%, 100% {
+                box-shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
+                border-color: var(--line);
+            }
+
+            50% {
+                box-shadow: 0 24px 76px rgba(82, 215, 255, 0.11);
+                border-color: rgba(82, 215, 255, 0.24);
+            }
+        }
+
+        @keyframes borderOrbit {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 260% 50%;
+            }
+        }
+
+        @keyframes sparkPop {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.4);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--spark-x)), calc(-50% + var(--spark-y))) scale(1);
             }
         }
 
@@ -893,6 +1228,20 @@
             justify-content: flex-end;
         }
 
+        .click-spark {
+            position: fixed;
+            left: var(--spark-left);
+            top: var(--spark-top);
+            z-index: 40;
+            width: 7px;
+            height: 7px;
+            border-radius: 99px;
+            background: var(--spark-color);
+            box-shadow: 0 0 18px var(--spark-color);
+            pointer-events: none;
+            animation: sparkPop 720ms ease-out forwards;
+        }
+
         footer {
             position: relative;
             z-index: 1;
@@ -1020,6 +1369,10 @@
                 max-width: none;
             }
 
+            .hero-chips {
+                display: none;
+            }
+
             h1 {
                 font-size: clamp(40px, 14vw, 56px);
             }
@@ -1089,6 +1442,11 @@
 </head>
 <body>
     <div class="scene" aria-hidden="true">
+        <div class="energy-ribbons">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
         <canvas id="networkCanvas"></canvas>
     </div>
 
@@ -1115,6 +1473,13 @@
 
     <main id="top">
         <section class="hero">
+            <div class="hero-chips" aria-hidden="true">
+                <span class="hero-chip">BETA ACCESS</span>
+                <span class="hero-chip">FABRIC 1.21.4</span>
+                <span class="hero-chip">AUTO SETUP</span>
+                <span class="hero-chip">MDW CLIENT</span>
+            </div>
+
             <div class="hero-asset" aria-hidden="true">
                 <div class="launcher-map">
                     <span class="map-scan"></span>
@@ -1127,7 +1492,7 @@
             <div class="shell">
                 <div class="hero-content">
                     <div class="eyebrow">Beta test • Подписанный лаунчер для MDW DLC</div>
-                    <h1><span class="text-gradient">MDW DLC</span></h1>
+                    <h1 class="glitch-title" data-text="MDW DLC"><span class="text-gradient">MDW DLC</span></h1>
                     <p class="hero-subtitle">
                         Быстрый установщик для Minecraft 1.21.4: скачивает нужные файлы,
                         помогает установить клиент и запускает игру без ручной сборки папок.
@@ -1422,6 +1787,36 @@
                 card.style.setProperty('--card-rx', '0deg');
                 card.style.setProperty('--card-ry', '0deg');
             });
+        });
+
+        document.querySelectorAll('.btn').forEach((button) => {
+            button.addEventListener('pointermove', (event) => {
+                const rect = button.getBoundingClientRect();
+                button.style.setProperty('--btn-x', (event.clientX - rect.left) + 'px');
+                button.style.setProperty('--btn-y', (event.clientY - rect.top) + 'px');
+            });
+        });
+
+        const sparkColors = ['#52d7ff', '#43f0b1', '#ff5f8f', '#ffc85a', '#8b73ff'];
+        document.addEventListener('pointerdown', (event) => {
+            if (prefersReducedMotion.matches) {
+                return;
+            }
+
+            for (let i = 0; i < 9; i++) {
+                const spark = document.createElement('span');
+                const angle = (Math.PI * 2 * i / 9) + Math.random() * 0.5;
+                const distance = 22 + Math.random() * 34;
+
+                spark.className = 'click-spark';
+                spark.style.setProperty('--spark-left', event.clientX + 'px');
+                spark.style.setProperty('--spark-top', event.clientY + 'px');
+                spark.style.setProperty('--spark-x', Math.cos(angle) * distance + 'px');
+                spark.style.setProperty('--spark-y', Math.sin(angle) * distance + 'px');
+                spark.style.setProperty('--spark-color', sparkColors[i % sparkColors.length]);
+                document.body.appendChild(spark);
+                spark.addEventListener('animationend', () => spark.remove(), { once: true });
+            }
         });
 
         const downloads = {
