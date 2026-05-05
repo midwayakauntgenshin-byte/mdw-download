@@ -57,6 +57,21 @@
             pointer-events: none;
         }
 
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(
+                420px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+                rgba(82, 215, 255, 0.14),
+                rgba(255, 95, 143, 0.06) 34%,
+                transparent 70%
+            );
+            opacity: 0.92;
+            pointer-events: none;
+        }
+
         a {
             color: inherit;
             text-decoration: none;
@@ -175,6 +190,10 @@
             color: var(--cyan);
         }
 
+        .nav-links .social-link {
+            color: #dbe7f7;
+        }
+
         .hero {
             min-height: 84svh;
             position: relative;
@@ -200,10 +219,11 @@
             width: min(520px, 42vw);
             height: 440px;
             opacity: 0.78;
-            transform: rotateX(58deg) rotateZ(-22deg) translateY(-26px);
+            transform: rotateX(58deg) rotateZ(-22deg) translateY(-26px) translate3d(var(--hero-shift-x, 0px), var(--hero-shift-y, 0px), 0);
             transform-origin: center;
             filter: drop-shadow(0 32px 42px rgba(0, 0, 0, 0.5));
             pointer-events: none;
+            transition: transform 120ms ease-out;
         }
 
         .launcher-map {
@@ -356,6 +376,38 @@
 
         .btn:hover:not(:disabled) {
             transform: translateY(-2px);
+        }
+
+        .cursor-card {
+            --spot-x: 50%;
+            --spot-y: 50%;
+            --card-rx: 0deg;
+            --card-ry: 0deg;
+            transform: perspective(900px) rotateX(var(--card-rx)) rotateY(var(--card-ry));
+            transform-style: preserve-3d;
+            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+            will-change: transform;
+        }
+
+        .cursor-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: inherit;
+            background: radial-gradient(
+                260px circle at var(--spot-x) var(--spot-y),
+                rgba(82, 215, 255, 0.18),
+                rgba(67, 240, 177, 0.08) 34%,
+                transparent 68%
+            );
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 180ms ease;
+        }
+
+        .cursor-card:hover::after {
+            opacity: 1;
         }
 
         .btn-primary {
@@ -517,13 +569,15 @@
 
         .download-wrap {
             display: grid;
-            grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.72fr);
+            grid-template-columns: minmax(0, 1fr);
             gap: 16px;
             align-items: stretch;
         }
 
         .download-panel,
-        .side-panel {
+        .community-card {
+            position: relative;
+            overflow: hidden;
             border: 1px solid var(--line);
             border-radius: 8px;
             background: var(--panel-strong);
@@ -584,7 +638,7 @@
 
         .install-card h3,
         .steps-card h3,
-        .side-panel h3 {
+        .community-card h3 {
             margin-bottom: 16px;
             font-size: 20px;
         }
@@ -597,6 +651,8 @@
         }
 
         .install-point {
+            position: relative;
+            overflow: hidden;
             min-height: 88px;
             border: 1px solid rgba(255, 255, 255, 0.09);
             border-radius: 8px;
@@ -701,38 +757,34 @@
             background: rgba(82, 215, 255, 0.08);
         }
 
-        .side-panel {
-            display: flex;
-            flex-direction: column;
+        .community-links {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 16px;
+            margin-top: 16px;
+        }
+
+        .community-card {
+            display: grid;
+            gap: 14px;
             padding: 24px;
         }
 
-        .file-list {
-            display: grid;
-            gap: 10px;
-        }
-
-        .file-card {
-            display: grid;
-            gap: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.035);
-        }
-
-        .file-card strong {
-            font-size: 16px;
-        }
-
-        .file-card p {
-            color: var(--muted-2);
+        .community-card span {
+            color: var(--cyan);
             font-size: 13px;
-            line-height: 1.55;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .community-card p {
+            color: var(--muted);
+            line-height: 1.6;
         }
 
         .support-band {
+            position: relative;
+            overflow: hidden;
             display: grid;
             grid-template-columns: 1fr auto;
             gap: 18px;
@@ -747,6 +799,13 @@
             margin-top: 8px;
             color: var(--muted);
             line-height: 1.65;
+        }
+
+        .support-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: flex-end;
         }
 
         footer {
@@ -797,7 +856,8 @@
             .stats,
             .feature-grid,
             .download-wrap,
-            .download-body {
+            .download-body,
+            .community-links {
                 grid-template-columns: 1fr;
             }
 
@@ -895,6 +955,11 @@
                 width: 100%;
             }
 
+            .support-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
             .stats {
                 display: none;
             }
@@ -907,7 +972,7 @@
             .download-top,
             .install-card,
             .steps-card,
-            .side-panel,
+            .community-card,
             .support-band {
                 padding: 20px;
             }
@@ -956,6 +1021,8 @@
                 <a href="#features">Возможности</a>
                 <a href="#download">Скачать</a>
                 <a href="#support">Поддержка</a>
+                <a class="social-link" href="https://t.me/mdwclient" target="_blank" rel="noopener">Telegram</a>
+                <a class="social-link" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">Discord</a>
                 <a class="nav-download" href="#download">Получить лаунчер</a>
             </div>
         </nav>
@@ -973,7 +1040,7 @@
 
             <div class="shell">
                 <div class="hero-content">
-                    <div class="eyebrow">Подписанный лаунчер для MDW DLC</div>
+                    <div class="eyebrow">Beta test • Подписанный лаунчер для MDW DLC</div>
                     <h1><span class="text-gradient">MDW DLC</span></h1>
                     <p class="hero-subtitle">
                         Быстрый установщик для Minecraft 1.21.4: скачивает нужные файлы,
@@ -999,8 +1066,8 @@
                             <span>Подписанный установщик</span>
                         </div>
                         <div class="stat">
-                            <strong>Auto</strong>
-                            <span>Java auto</span>
+                            <strong>Beta</strong>
+                            <span>Test access</span>
                         </div>
                     </div>
                 </div>
@@ -1020,29 +1087,29 @@
             </div>
 
             <div class="feature-grid">
-                <article class="feature-card">
+                <article class="feature-card cursor-card">
                     <span class="feature-index">01</span>
                     <h3>Один главный файл</h3>
                     <p>Подписанный установщик скачивает нужные компоненты и не заставляет вручную раскладывать архивы.</p>
                 </article>
 
-                <article class="feature-card">
+                <article class="feature-card cursor-card">
                     <span class="feature-index">02</span>
                     <h3>Четкие шаги запуска</h3>
                     <p>Инструкция теперь видна рядом с кнопкой скачивания: скачал, запустил, ввел ключ, установил, запустил игру.</p>
                 </article>
 
-                <article class="feature-card">
+                <article class="feature-card cursor-card">
                     <span class="feature-index">03</span>
-                    <h3>Дополнительные файлы</h3>
-                    <p>BAT, PowerShell-скрипт и инструкция оставлены отдельными кнопками, чтобы их было легко отправить другу.</p>
+                    <h3>Комьюнити и поддержка</h3>
+                    <p>Для новостей есть Telegram, а для помощи и вопросов по beta test открыт Discord-сервер MDW.</p>
                 </article>
             </div>
         </section>
 
         <section class="section shell reveal" id="download">
             <div class="download-wrap">
-                <div class="download-panel">
+                <div class="download-panel cursor-card">
                     <div class="download-top">
                         <div>
                             <div class="section-kicker">Download</div>
@@ -1052,7 +1119,7 @@
                                 окружение, скачает клиент и поможет стартовать Minecraft.
                             </p>
                         </div>
-                        <div class="release-badge">Stable build</div>
+                        <div class="release-badge">Beta test</div>
                     </div>
 
                     <div class="download-body">
@@ -1061,19 +1128,19 @@
                             <button class="btn btn-primary" type="button" onclick="downloadLauncher()">Скачать MDWLauncher-Installer.exe</button>
 
                             <div class="install-points">
-                                <div class="install-point">
+                                <div class="install-point cursor-card">
                                     <strong>Цифровая подпись</strong>
                                     <span>Windows понятнее, откуда файл и кто его выпустил.</span>
                                 </div>
-                                <div class="install-point">
+                                <div class="install-point cursor-card">
                                     <strong>Java автоматически</strong>
                                     <span>Если Java нет, лаунчер предложит загрузку при первом запуске.</span>
                                 </div>
-                                <div class="install-point">
+                                <div class="install-point cursor-card">
                                     <strong>Быстрый старт</strong>
                                     <span>Без ручной настройки Fabric и копирования файлов.</span>
                                 </div>
-                                <div class="install-point">
+                                <div class="install-point cursor-card">
                                     <strong>Ключ лицензии</strong>
                                     <span>Вводится уже внутри лаунчера перед установкой клиента.</span>
                                 </div>
@@ -1099,42 +1166,36 @@
                     </div>
                 </div>
 
-                <aside class="side-panel">
-                    <h3>Дополнительные файлы</h3>
-                    <div class="file-list">
-                        <article class="file-card">
-                            <strong>play-mdw.bat</strong>
-                            <p>Командный запуск игры для быстрого старта.</p>
-                            <button class="btn btn-secondary btn-small" type="button" onclick="downloadPlayBat()">Скачать BAT</button>
-                        </article>
+                <div class="community-links">
+                    <a class="community-card cursor-card" href="https://t.me/mdwclient" target="_blank" rel="noopener">
+                        <span>Telegram</span>
+                        <h3>Новости beta test</h3>
+                        <p>Канал MDW с обновлениями, объявлениями и важной информацией по клиенту.</p>
+                    </a>
 
-                        <article class="file-card">
-                            <strong>play-mdw.ps1</strong>
-                            <p>PowerShell-скрипт с расширенными настройками запуска.</p>
-                            <button class="btn btn-secondary btn-small" type="button" onclick="downloadPlayPs1()">Скачать PS1</button>
-                        </article>
-
-                        <article class="file-card">
-                            <strong>Инструкция</strong>
-                            <p>Короткое руководство, которое удобно отправить другу.</p>
-                            <button class="btn btn-secondary btn-small" type="button" onclick="downloadInstructions()">Скачать инструкцию</button>
-                        </article>
-                    </div>
-                </aside>
+                    <a class="community-card cursor-card" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">
+                        <span>Discord</span>
+                        <h3>Поддержка и доступ</h3>
+                        <p>Сервер для вопросов по запуску, ключам, beta test и быстрым ответам от команды.</p>
+                    </a>
+                </div>
             </div>
         </section>
 
         <section class="section shell reveal" id="support">
-            <div class="support-band">
+            <div class="support-band cursor-card">
                 <div>
                     <div class="section-kicker">Поддержка</div>
-                    <h2 class="section-title">Если запуск не пошел с первого раза, начни с инструкции.</h2>
+                    <h2 class="section-title">Поддержка beta test теперь в Discord.</h2>
                     <p>
-                        Там собраны базовые действия для Windows, запуска установщика,
-                        ключа лицензии и первого старта Minecraft через лаунчер.
+                        Заходи на сервер MDW, если нужна помощь с запуском, ключом,
+                        установкой лаунчера или доступом к beta test.
                     </p>
                 </div>
-                <button class="btn btn-secondary" type="button" onclick="downloadInstructions()">Скачать инструкцию</button>
+                <div class="support-actions">
+                    <a class="btn btn-primary" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">Discord support</a>
+                    <a class="btn btn-secondary" href="https://t.me/mdwclient" target="_blank" rel="noopener">Telegram</a>
+                </div>
             </div>
         </section>
     </main>
@@ -1238,47 +1299,56 @@
 
         revealElements.forEach((element) => revealObserver.observe(element));
 
+        let cursorAnimationFrame = null;
+        document.addEventListener('pointermove', (event) => {
+            if (cursorAnimationFrame) {
+                cancelAnimationFrame(cursorAnimationFrame);
+            }
+
+            cursorAnimationFrame = requestAnimationFrame(() => {
+                const x = event.clientX;
+                const y = event.clientY;
+                const shiftX = ((x / window.innerWidth) - 0.5) * -18;
+                const shiftY = ((y / window.innerHeight) - 0.5) * -14;
+
+                document.documentElement.style.setProperty('--cursor-x', x + 'px');
+                document.documentElement.style.setProperty('--cursor-y', y + 'px');
+                document.documentElement.style.setProperty('--hero-shift-x', shiftX.toFixed(2) + 'px');
+                document.documentElement.style.setProperty('--hero-shift-y', shiftY.toFixed(2) + 'px');
+            });
+        });
+
+        document.querySelectorAll('.cursor-card').forEach((card) => {
+            card.addEventListener('pointermove', (event) => {
+                const rect = card.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                const centerX = x / rect.width - 0.5;
+                const centerY = y / rect.height - 0.5;
+
+                card.style.setProperty('--spot-x', x + 'px');
+                card.style.setProperty('--spot-y', y + 'px');
+                card.style.setProperty('--card-rx', (-centerY * 4).toFixed(2) + 'deg');
+                card.style.setProperty('--card-ry', (centerX * 5).toFixed(2) + 'deg');
+            });
+
+            card.addEventListener('pointerleave', () => {
+                card.style.setProperty('--card-rx', '0deg');
+                card.style.setProperty('--card-ry', '0deg');
+            });
+        });
+
         const downloads = {
             launcher: {
                 url: 'https://license-production-d47b.up.railway.app/api/launcher/exe',
                 filename: 'MDWLauncher-Installer.exe',
                 start: 'Загружаю подписанный лаунчер...',
                 done: 'Готово. Запусти MDWLauncher-Installer.exe.'
-            },
-            playBat: {
-                url: 'https://license-production-d47b.up.railway.app/api/launcher/play-bat',
-                filename: 'play-mdw.bat',
-                start: 'Загружаю play-mdw.bat...',
-                done: 'play-mdw.bat скачан.'
-            },
-            playPs1: {
-                url: 'https://license-production-d47b.up.railway.app/api/launcher/play-ps1',
-                filename: 'play-mdw.ps1',
-                start: 'Загружаю play-mdw.ps1...',
-                done: 'play-mdw.ps1 скачан.'
-            },
-            instructions: {
-                url: 'https://license-production-d47b.up.railway.app/api/launcher/instructions',
-                filename: 'ДЛЯ_ДРУГА.md',
-                start: 'Загружаю инструкцию...',
-                done: 'Инструкция скачана.'
             }
         };
 
         async function downloadLauncher() {
             await downloadFile(downloads.launcher);
-        }
-
-        async function downloadPlayBat() {
-            await downloadFile(downloads.playBat);
-        }
-
-        async function downloadPlayPs1() {
-            await downloadFile(downloads.playPs1);
-        }
-
-        async function downloadInstructions() {
-            await downloadFile(downloads.instructions);
         }
 
         async function downloadFile(file) {
