@@ -1,1920 +1,1422 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MDW DLC - Download</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #070910;
-            --bg-soft: #0d111d;
-            --panel: rgba(14, 19, 33, 0.82);
-            --panel-strong: rgba(18, 24, 40, 0.94);
-            --line: rgba(184, 197, 255, 0.13);
-            --line-strong: rgba(96, 212, 255, 0.4);
-            --text: #f4f7fb;
-            --muted: #9da9bd;
-            --muted-2: #68758a;
-            --cyan: #52d7ff;
-            --mint: #43f0b1;
-            --rose: #ff5f8f;
-            --amber: #ffc85a;
-            --violet: #8b73ff;
-            --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            min-height: 100vh;
-            overflow-x: hidden;
-            background:
-                linear-gradient(180deg, rgba(7, 9, 16, 0.86), var(--bg) 38%, #090b12 100%),
-                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 96px),
-                repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 96px);
-            color: var(--text);
-            font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            letter-spacing: 0;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -3;
-            background:
-                linear-gradient(115deg, rgba(82, 215, 255, 0.12), transparent 32%),
-                linear-gradient(245deg, rgba(255, 95, 143, 0.1), transparent 36%),
-                linear-gradient(180deg, transparent 0%, rgba(67, 240, 177, 0.07) 100%);
-            pointer-events: none;
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: radial-gradient(
-                150px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
-                rgba(82, 215, 255, 0.08),
-                rgba(255, 95, 143, 0.03) 34%,
-                transparent 70%
-            );
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 180ms ease;
-        }
-
-        body.cursor-lit::after {
-            opacity: 0.46;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        .scene {
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            pointer-events: none;
-        }
-
-        .energy-ribbons {
-            position: absolute;
-            inset: -18% -12%;
-            overflow: hidden;
-            opacity: 0.7;
-            mix-blend-mode: screen;
-        }
-
-        .energy-ribbons span {
-            position: absolute;
-            left: -18%;
-            width: 140%;
-            height: 2px;
-            border-radius: 99px;
-            background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.04), rgba(82, 215, 255, 0.55), rgba(255, 95, 143, 0.35), transparent);
-            filter: drop-shadow(0 0 16px rgba(82, 215, 255, 0.35));
-            transform: rotate(-18deg) translateX(-18%);
-            animation: ribbonDrift 7.4s ease-in-out infinite;
-        }
-
-        .energy-ribbons span:nth-child(1) {
-            top: 24%;
-        }
-
-        .energy-ribbons span:nth-child(2) {
-            top: 53%;
-            animation-delay: -2.3s;
-            animation-duration: 8.8s;
-            background: linear-gradient(90deg, transparent, rgba(67, 240, 177, 0.03), rgba(67, 240, 177, 0.44), rgba(139, 115, 255, 0.34), transparent);
-        }
-
-        .energy-ribbons span:nth-child(3) {
-            top: 78%;
-            animation-delay: -4.8s;
-            animation-duration: 10.2s;
-            background: linear-gradient(90deg, transparent, rgba(255, 200, 90, 0.03), rgba(255, 95, 143, 0.42), rgba(82, 215, 255, 0.32), transparent);
-        }
-
-        #networkCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            opacity: 0.72;
-        }
-
-        .shell {
-            width: min(1180px, calc(100% - 48px));
-            margin: 0 auto;
-        }
-
-        .site-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 20;
-            border-bottom: 1px solid var(--line);
-            background: rgba(7, 9, 16, 0.76);
-            backdrop-filter: blur(22px);
-        }
-
-        .nav {
-            height: 76px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 24px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: fit-content;
-            font-weight: 850;
-        }
-
-        .brand-mark {
-            width: 38px;
-            height: 38px;
-            display: grid;
-            place-items: center;
-            border: 1px solid rgba(82, 215, 255, 0.48);
-            border-radius: 8px;
-            background:
-                linear-gradient(135deg, rgba(82, 215, 255, 0.22), rgba(255, 95, 143, 0.12)),
-                rgba(255, 255, 255, 0.04);
-            box-shadow: 0 0 30px rgba(82, 215, 255, 0.2);
-            color: var(--cyan);
-            font-size: 13px;
-        }
-
-        .brand-copy {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            line-height: 1;
-        }
-
-        .brand-copy strong {
-            font-size: 16px;
-        }
-
-        .brand-copy span {
-            color: var(--muted-2);
-            font-size: 11px;
-            font-weight: 650;
-            text-transform: uppercase;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-links a {
-            min-height: 40px;
-            display: inline-flex;
-            align-items: center;
-            border-radius: 8px;
-            padding: 0 14px;
-            color: var(--muted);
-            font-size: 14px;
-            font-weight: 650;
-            transition: color 180ms ease, background 180ms ease;
-        }
-
-        .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text);
-        }
-
-        .nav-links .nav-download {
-            border: 1px solid rgba(82, 215, 255, 0.36);
-            background: rgba(82, 215, 255, 0.1);
-            color: var(--cyan);
-        }
-
-        .nav-links .social-link {
-            color: #dbe7f7;
-        }
-
-        .hero {
-            min-height: 84svh;
-            position: relative;
-            display: grid;
-            align-items: center;
-            padding: 136px 0 70px;
-        }
-
-        .hero::after {
-            content: "";
-            position: absolute;
-            left: 50%;
-            bottom: 26px;
-            width: min(760px, 70vw);
-            height: 1px;
-            transform: translateX(-50%);
-            background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.42), rgba(255, 95, 143, 0.25), transparent);
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            inset: 76px 0 auto;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.2), transparent);
-            animation: horizonPulse 4s ease-in-out infinite;
-        }
-
-        .hero-asset {
-            position: absolute;
-            inset: 112px max(28px, calc((100vw - 1180px) / 2)) auto auto;
-            width: min(520px, 42vw);
-            height: 440px;
-            opacity: 0.78;
-            transform: rotateX(58deg) rotateZ(-22deg) translateY(-26px) translate3d(var(--hero-shift-x, 0px), var(--hero-shift-y, 0px), 0);
-            transform-origin: center;
-            filter: drop-shadow(0 32px 42px rgba(0, 0, 0, 0.5));
-            pointer-events: none;
-            transition: transform 120ms ease-out;
-        }
-
-        .launcher-map {
-            position: absolute;
-            inset: 0;
-            border: 1px solid rgba(82, 215, 255, 0.24);
-            border-radius: 8px;
-            background:
-                linear-gradient(90deg, rgba(82, 215, 255, 0.12) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(135deg, rgba(13, 18, 31, 0.94), rgba(20, 25, 39, 0.65));
-            background-size: 42px 42px, 42px 42px, 100% 100%;
-            overflow: hidden;
-        }
-
-        .map-scan {
-            position: absolute;
-            top: -20%;
-            bottom: -20%;
-            width: 68px;
-            left: -120px;
-            background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.22), transparent);
-            filter: blur(1px);
-            transform: skewX(-18deg);
-            animation: mapScan 6s ease-in-out infinite;
-        }
-
-        .launcher-map::before,
-        .launcher-map::after {
-            content: "";
-            position: absolute;
-            border: 1px solid rgba(82, 215, 255, 0.34);
-            border-radius: 8px;
-            background: rgba(7, 9, 16, 0.58);
-        }
-
-        .launcher-map::before {
-            inset: 36px 44px auto auto;
-            width: 220px;
-            height: 120px;
-        }
-
-        .launcher-map::after {
-            left: 52px;
-            bottom: 54px;
-            width: 290px;
-            height: 96px;
-            border-color: rgba(255, 200, 90, 0.34);
-        }
-
-        .map-line {
-            position: absolute;
-            height: 2px;
-            border-radius: 99px;
-            background: linear-gradient(90deg, transparent, var(--cyan), var(--mint), transparent);
-            background-size: 240% 100%;
-            opacity: 0.78;
-            animation: linePulse 3.4s ease-in-out infinite;
-        }
-
-        .map-line.one {
-            left: 12%;
-            right: 18%;
-            top: 36%;
-            transform: rotate(-8deg);
-        }
-
-        .map-line.two {
-            left: 22%;
-            right: 10%;
-            top: 62%;
-            transform: rotate(12deg);
-            background: linear-gradient(90deg, transparent, var(--rose), var(--amber), transparent);
-            background-size: 240% 100%;
-            animation-delay: -1.2s;
-        }
-
-        .map-line.three {
-            left: 8%;
-            right: 34%;
-            top: 78%;
-            transform: rotate(-15deg);
-            animation-delay: -2s;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            width: min(880px, 100%);
-        }
-
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            min-height: 36px;
-            padding: 0 12px;
-            border: 1px solid rgba(82, 215, 255, 0.24);
-            border-radius: 8px;
-            background: rgba(82, 215, 255, 0.08);
-            color: var(--cyan);
-            font-size: 13px;
-            font-weight: 750;
-        }
-
-        .eyebrow::before {
-            content: "";
-            width: 8px;
-            height: 8px;
-            border-radius: 99px;
-            background: var(--mint);
-            box-shadow: 0 0 18px var(--mint);
-            animation: betaPulse 2.4s ease-in-out infinite;
-        }
-
-        h1 {
-            margin-top: 24px;
-            max-width: 820px;
-            font-size: clamp(54px, 8vw, 112px);
-            line-height: 0.9;
-            font-weight: 920;
-            letter-spacing: 0;
-        }
-
-        .glitch-title {
-            position: relative;
-            width: fit-content;
-        }
-
-        .glitch-title::before,
-        .glitch-title::after {
-            content: attr(data-text);
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            opacity: 0;
-        }
-
-        .glitch-title::before {
-            color: rgba(82, 215, 255, 0.5);
-            transform: translate(3px, -2px);
-            clip-path: inset(0 0 58% 0);
-            animation: titleGlitch 6.8s steps(1, end) infinite;
-        }
-
-        .glitch-title::after {
-            color: rgba(255, 95, 143, 0.42);
-            transform: translate(-3px, 2px);
-            clip-path: inset(54% 0 0 0);
-            animation: titleGlitch 7.3s steps(1, end) infinite reverse;
-        }
-
-        .text-gradient {
-            display: inline-block;
-            background: linear-gradient(100deg, var(--text), var(--cyan) 48%, var(--rose));
-            background-size: 220% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: titleFlow 4.8s ease-in-out infinite;
-        }
-
-        .hero-chips {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .hero-chip {
-            position: absolute;
-            min-height: 30px;
-            display: inline-flex;
-            align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 0 10px;
-            background: rgba(8, 12, 22, 0.5);
-            color: rgba(244, 247, 251, 0.68);
-            font-size: 12px;
-            font-weight: 850;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
-            animation: chipFloat 6.4s ease-in-out infinite;
-        }
-
-        .hero-chip:nth-child(1) {
-            top: 18%;
-            left: 5%;
-            color: var(--mint);
-        }
-
-        .hero-chip:nth-child(2) {
-            top: 29%;
-            right: 12%;
-            color: var(--cyan);
-            animation-delay: -1.5s;
-        }
-
-        .hero-chip:nth-child(3) {
-            left: 50%;
-            bottom: 36%;
-            color: var(--amber);
-            animation-delay: -3s;
-        }
-
-        .hero-chip:nth-child(4) {
-            right: 5%;
-            bottom: 30%;
-            color: var(--rose);
-            animation-delay: -4.5s;
-        }
-
-        .hero-subtitle {
-            max-width: 690px;
-            margin-top: 28px;
-            color: var(--muted);
-            font-size: clamp(17px, 2vw, 22px);
-            line-height: 1.65;
-        }
-
-        .hero-actions {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 14px;
-            margin-top: 36px;
-        }
-
-        .btn {
-            position: relative;
-            overflow: hidden;
-            min-height: 52px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 0 22px;
-            cursor: pointer;
-            color: var(--text);
-            font-weight: 800;
-            transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-        }
-
-        .btn::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(130px circle at var(--btn-x, 50%) var(--btn-y, 50%), rgba(255, 255, 255, 0.22), transparent 62%);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 180ms ease;
-        }
-
-        .btn:hover::before {
-            opacity: 1;
-        }
-
-        .btn:disabled {
-            cursor: wait;
-            opacity: 0.66;
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-        }
-
-        .cursor-card {
-            --spot-x: 50%;
-            --spot-y: 50%;
-            --card-rx: 0deg;
-            --card-ry: 0deg;
-            transform: perspective(900px) rotateX(var(--card-rx)) rotateY(var(--card-ry));
-            transform-style: preserve-3d;
-            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
-            will-change: transform;
-        }
-
-        .cursor-card::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            border-radius: inherit;
-            background: radial-gradient(
-                145px circle at var(--spot-x) var(--spot-y),
-                rgba(82, 215, 255, 0.09),
-                rgba(67, 240, 177, 0.035) 34%,
-                transparent 68%
-            );
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 180ms ease;
-        }
-
-        .cursor-card:hover::after {
-            opacity: 0.72;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #23b7ff, #8b73ff 54%, #ff5f8f);
-            box-shadow: 0 16px 44px rgba(82, 215, 255, 0.22);
-        }
-
-        .btn-primary::after {
-            content: "";
-            position: absolute;
-            inset: -1px auto -1px -45%;
-            width: 34%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
-            transform: skewX(-22deg);
-            animation: buttonSweep 4.8s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            box-shadow: 0 22px 60px rgba(255, 95, 143, 0.24);
-        }
-
-        .btn-secondary {
-            border-color: rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text);
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            border-color: rgba(82, 215, 255, 0.38);
-            background: rgba(82, 215, 255, 0.1);
-        }
-
-        .btn-small {
-            width: 100%;
-            min-height: 46px;
-            padding: 0 16px;
-            font-size: 14px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 1px;
-            margin-top: 54px;
-            overflow: hidden;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: var(--line);
-            box-shadow: var(--shadow);
-        }
-
-        .stat {
-            min-width: 0;
-            min-height: 92px;
-            position: relative;
-            overflow: hidden;
-            padding: 18px;
-            background: rgba(13, 17, 29, 0.82);
-        }
-
-        .stat::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(115deg, transparent 0 36%, rgba(82, 215, 255, 0.08) 46%, transparent 58%);
-            transform: translateX(-100%);
-            animation: statSweep 6s ease-in-out infinite;
-        }
-
-        .stat:nth-child(2)::before {
-            animation-delay: -1s;
-        }
-
-        .stat:nth-child(3)::before {
-            animation-delay: -2s;
-        }
-
-        .stat:nth-child(4)::before {
-            animation-delay: -3s;
-        }
-
-        .stat strong {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text);
-            font-size: 20px;
-        }
-
-        .stat span {
-            display: block;
-            color: var(--muted-2);
-            font-size: 13px;
-            font-weight: 650;
-            overflow-wrap: anywhere;
-        }
-
-        .section {
-            position: relative;
-            z-index: 1;
-            padding: 86px 0;
-        }
-
-        .section-head {
-            display: flex;
-            align-items: end;
-            justify-content: space-between;
-            gap: 28px;
-            margin-bottom: 28px;
-        }
-
-        .section-kicker {
-            color: var(--cyan);
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .section-title {
-            max-width: 720px;
-            margin-top: 10px;
-            font-size: clamp(34px, 4vw, 58px);
-            line-height: 1.02;
-            font-weight: 900;
-        }
-
-        .section-copy {
-            max-width: 430px;
-            color: var(--muted);
-            line-height: 1.7;
-            font-size: 16px;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        .feature-card {
-            min-height: 260px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 26px;
-            background: var(--panel);
-            box-shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
-            animation: cardBreathe 8s ease-in-out infinite;
-        }
-
-        .feature-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--cyan), var(--mint), var(--rose));
-        }
-
-        .feature-card:nth-child(2)::before {
-            background: linear-gradient(90deg, var(--amber), var(--rose), var(--violet));
-        }
-
-        .feature-card:nth-child(3)::before {
-            background: linear-gradient(90deg, var(--mint), var(--cyan), var(--amber));
-        }
-
-        .feature-card:nth-child(2) {
-            animation-delay: -1.5s;
-        }
-
-        .feature-card:nth-child(3) {
-            animation-delay: -3s;
-        }
-
-        .feature-index {
-            display: inline-flex;
-            align-items: center;
-            min-height: 32px;
-            margin-bottom: 42px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 0 10px;
-            color: var(--muted-2);
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .feature-card h3 {
-            max-width: 280px;
-            margin-bottom: 14px;
-            font-size: 23px;
-            line-height: 1.18;
-        }
-
-        .feature-card p {
-            color: var(--muted);
-            line-height: 1.65;
-        }
-
-        .download-wrap {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr);
-            gap: 16px;
-            align-items: stretch;
-        }
-
-        .download-panel,
-        .community-card {
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: var(--panel-strong);
-            box-shadow: var(--shadow);
-        }
-
-        .download-panel::before,
-        .community-card::before,
-        .support-band::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(120deg, rgba(82, 215, 255, 0.62), rgba(67, 240, 177, 0), rgba(255, 95, 143, 0.58), rgba(255, 200, 90, 0));
-            background-size: 260% 260%;
-            opacity: 0.32;
-            pointer-events: none;
-            animation: borderOrbit 6.8s linear infinite;
-            -webkit-mask:
-                linear-gradient(#000 0 0) content-box,
-                linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-        }
-
-        .download-panel {
-            overflow: hidden;
-        }
-
-        .download-top {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 20px;
-            padding: 30px;
-            border-bottom: 1px solid var(--line);
-            background:
-                linear-gradient(90deg, rgba(82, 215, 255, 0.12), transparent 44%),
-                linear-gradient(135deg, rgba(255, 95, 143, 0.09), transparent 52%);
-        }
-
-        .download-top h2 {
-            font-size: clamp(30px, 4vw, 48px);
-            line-height: 1.02;
-        }
-
-        .download-top p {
-            max-width: 590px;
-            margin-top: 14px;
-            color: var(--muted);
-            line-height: 1.65;
-        }
-
-        .release-badge {
-            align-self: start;
-            border: 1px solid rgba(67, 240, 177, 0.32);
-            border-radius: 8px;
-            padding: 12px 14px;
-            background: rgba(67, 240, 177, 0.08);
-            color: var(--mint);
-            font-size: 13px;
-            font-weight: 850;
-            white-space: nowrap;
-            animation: badgeFloat 3.2s ease-in-out infinite;
-        }
-
-        @keyframes betaPulse {
-            0%, 100% {
-                opacity: 0.82;
-                transform: scale(1);
-                box-shadow: 0 0 14px rgba(67, 240, 177, 0.72);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.35);
-                box-shadow: 0 0 24px rgba(67, 240, 177, 0.95);
-            }
-        }
-
-        @keyframes buttonSweep {
-            0%, 58%, 100% {
-                left: -45%;
-                opacity: 0;
-            }
-
-            68% {
-                opacity: 0.9;
-            }
-
-            86% {
-                left: 112%;
-                opacity: 0;
-            }
-        }
-
-        @keyframes mapScan {
-            0%, 45%, 100% {
-                left: -120px;
-                opacity: 0;
-            }
-
-            55% {
-                opacity: 0.7;
-            }
-
-            78% {
-                left: calc(100% + 80px);
-                opacity: 0;
-            }
-        }
-
-        @keyframes badgeFloat {
-            0%, 100% {
-                transform: translateY(0);
-                border-color: rgba(67, 240, 177, 0.32);
-            }
-
-            50% {
-                transform: translateY(-3px);
-                border-color: rgba(82, 215, 255, 0.44);
-            }
-        }
-
-        @keyframes ribbonDrift {
-            0%, 100% {
-                transform: rotate(-18deg) translateX(-22%);
-                opacity: 0;
-            }
-
-            16%, 78% {
-                opacity: 1;
-            }
-
-            58% {
-                transform: rotate(-18deg) translateX(10%);
-            }
-        }
-
-        @keyframes horizonPulse {
-            0%, 100% {
-                opacity: 0.18;
-                transform: scaleX(0.58);
-            }
-
-            50% {
-                opacity: 0.62;
-                transform: scaleX(1);
-            }
-        }
-
-        @keyframes linePulse {
-            0%, 100% {
-                background-position: 0% 50%;
-                opacity: 0.42;
-                filter: drop-shadow(0 0 4px rgba(82, 215, 255, 0.18));
-            }
-
-            50% {
-                background-position: 100% 50%;
-                opacity: 0.95;
-                filter: drop-shadow(0 0 14px rgba(82, 215, 255, 0.5));
-            }
-        }
-
-        @keyframes titleFlow {
-            0%, 100% {
-                background-position: 0% 50%;
-                filter: drop-shadow(0 0 0 rgba(82, 215, 255, 0));
-            }
-
-            50% {
-                background-position: 100% 50%;
-                filter: drop-shadow(0 0 24px rgba(82, 215, 255, 0.22));
-            }
-        }
-
-        @keyframes titleGlitch {
-            0%, 84%, 100% {
-                opacity: 0;
-                transform: translate(0, 0);
-            }
-
-            85% {
-                opacity: 0.65;
-                transform: translate(5px, -2px);
-            }
-
-            86% {
-                opacity: 0;
-                transform: translate(-4px, 3px);
-            }
-
-            89% {
-                opacity: 0.48;
-                transform: translate(-3px, 2px);
-            }
-
-            90% {
-                opacity: 0;
-                transform: translate(0, 0);
-            }
-        }
-
-        @keyframes chipFloat {
-            0%, 100% {
-                transform: translate3d(0, 0, 0) rotate(0deg);
-                opacity: 0.44;
-            }
-
-            50% {
-                transform: translate3d(12px, -18px, 0) rotate(1.5deg);
-                opacity: 0.9;
-            }
-        }
-
-        @keyframes statSweep {
-            0%, 60%, 100% {
-                transform: translateX(-120%);
-            }
-
-            78% {
-                transform: translateX(120%);
-            }
-        }
-
-        @keyframes cardBreathe {
-            0%, 100% {
-                box-shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
-                border-color: var(--line);
-            }
-
-            50% {
-                box-shadow: 0 24px 76px rgba(82, 215, 255, 0.11);
-                border-color: rgba(82, 215, 255, 0.24);
-            }
-        }
-
-        @keyframes borderOrbit {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            100% {
-                background-position: 260% 50%;
-            }
-        }
-
-        @keyframes sparkPop {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(0.4);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translate(calc(-50% + var(--spark-x)), calc(-50% + var(--spark-y))) scale(1);
-            }
-        }
-
-        .download-body {
-            display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
-            gap: 1px;
-            background: var(--line);
-        }
-
-        .install-card,
-        .steps-card {
-            padding: 28px;
-            background: rgba(10, 14, 24, 0.84);
-        }
-
-        .install-card h3,
-        .steps-card h3,
-        .community-card h3 {
-            margin-bottom: 16px;
-            font-size: 20px;
-        }
-
-        .install-points {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-            margin: 22px 0;
-        }
-
-        .install-point {
-            position: relative;
-            overflow: hidden;
-            min-height: 88px;
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            border-radius: 8px;
-            padding: 14px;
-            background: rgba(255, 255, 255, 0.035);
-        }
-
-        .install-point strong {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--text);
-            font-size: 15px;
-        }
-
-        .install-point span {
-            color: var(--muted-2);
-            font-size: 13px;
-            line-height: 1.45;
-        }
-
-        .steps-list {
-            display: grid;
-            gap: 12px;
-            counter-reset: steps;
-            list-style: none;
-        }
-
-        .steps-list li {
-            position: relative;
-            min-height: 48px;
-            padding-left: 52px;
-            color: var(--muted);
-            line-height: 1.55;
-        }
-
-        .steps-list li::before {
-            counter-increment: steps;
-            content: counter(steps, decimal-leading-zero);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 36px;
-            height: 36px;
-            display: grid;
-            place-items: center;
-            border: 1px solid rgba(82, 215, 255, 0.28);
-            border-radius: 8px;
-            color: var(--cyan);
-            background: rgba(82, 215, 255, 0.07);
-            font-size: 12px;
-            font-weight: 850;
-        }
-
-        .status-wrap {
-            padding: 0 28px 28px;
-            background: rgba(10, 14, 24, 0.84);
-        }
-
-        .progress-bar {
-            display: none;
-            width: 100%;
-            height: 8px;
-            overflow: hidden;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            border-radius: inherit;
-            background: linear-gradient(90deg, var(--cyan), var(--mint), var(--rose));
-            transition: width 260ms ease;
-        }
-
-        .status {
-            display: none;
-            margin-top: 14px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 14px 16px;
-            color: var(--muted);
-            background: rgba(255, 255, 255, 0.04);
-            font-weight: 720;
-        }
-
-        .status.success {
-            border-color: rgba(67, 240, 177, 0.34);
-            color: #8cffd5;
-            background: rgba(67, 240, 177, 0.08);
-        }
-
-        .status.error {
-            border-color: rgba(255, 95, 143, 0.36);
-            color: #ff9ebb;
-            background: rgba(255, 95, 143, 0.08);
-        }
-
-        .status.info {
-            border-color: rgba(82, 215, 255, 0.34);
-            color: #a7eaff;
-            background: rgba(82, 215, 255, 0.08);
-        }
-
-        .community-links {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .community-card {
-            display: grid;
-            gap: 14px;
-            padding: 24px;
-        }
-
-        .community-card span {
-            color: var(--cyan);
-            font-size: 13px;
-            font-weight: 850;
-            text-transform: uppercase;
-        }
-
-        .community-card p {
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .support-band {
-            position: relative;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 18px;
-            align-items: center;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 24px;
-            background: rgba(255, 255, 255, 0.035);
-        }
-
-        .support-band p {
-            margin-top: 8px;
-            color: var(--muted);
-            line-height: 1.65;
-        }
-
-        .support-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: flex-end;
-        }
-
-        .click-spark {
-            position: fixed;
-            left: var(--spark-left);
-            top: var(--spark-top);
-            z-index: 40;
-            width: 7px;
-            height: 7px;
-            border-radius: 99px;
-            background: var(--spark-color);
-            box-shadow: 0 0 18px var(--spark-color);
-            pointer-events: none;
-            animation: sparkPop 720ms ease-out forwards;
-        }
-
-        footer {
-            position: relative;
-            z-index: 1;
-            border-top: 1px solid var(--line);
-            padding: 34px 0;
-            color: var(--muted-2);
-            background: rgba(5, 7, 12, 0.66);
-        }
-
-        .footer-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            font-size: 14px;
-        }
-
-        .reveal {
-            opacity: 0.46;
-            transform: translateY(16px);
-            transition: opacity 520ms ease, transform 520ms ease;
-        }
-
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 980px) {
-            .nav-links a:not(.nav-download) {
-                display: none;
-            }
-
-            .hero {
-                min-height: auto;
-                padding: 124px 0 60px;
-            }
-
-            .hero-asset {
-                inset: 104px 24px auto auto;
-                width: min(500px, 88vw);
-                height: 340px;
-                opacity: 0.32;
-            }
-
-            .stats,
-            .feature-grid,
-            .download-wrap,
-            .download-body,
-            .community-links {
-                grid-template-columns: 1fr;
-            }
-
-            .section-head,
-            .support-band,
-            .footer-row {
-                align-items: start;
-                grid-template-columns: 1fr;
-                flex-direction: column;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .shell {
-                width: calc(100% - 40px);
-                padding-inline: 0;
-            }
-
-            .nav {
-                height: 68px;
-                gap: 12px;
-            }
-
-            .brand {
-                gap: 10px;
-                min-width: 0;
-            }
-
-            .brand-copy strong {
-                max-width: 92px;
-                overflow: hidden;
-                font-size: 14px;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-
-            .brand-copy span {
-                display: none;
-            }
-
-            .nav-links {
-                flex: 0 0 auto;
-                margin-left: auto;
-            }
-
-            .nav-links .nav-download {
-                width: 50px;
-                min-width: 50px;
-                min-height: 38px;
-                overflow: hidden;
-                padding: 0;
-                color: transparent;
-                white-space: nowrap;
-            }
-
-            .nav-links .nav-download::after {
-                content: "EXE";
-                color: var(--cyan);
-                font-size: 13px;
-                font-weight: 850;
-            }
-
-            .hero {
-                padding-top: 104px;
-            }
-
-            .hero-content {
-                width: 100%;
-            }
-
-            .hero-asset {
-                left: -36px;
-                right: -58px;
-                width: auto;
-                max-width: none;
-            }
-
-            .hero-chips {
-                display: none;
-            }
-
-            h1 {
-                font-size: clamp(40px, 14vw, 56px);
-            }
-
-            .hero-subtitle {
-                max-width: 330px;
-                font-size: 16px;
-                overflow-wrap: break-word;
-            }
-
-            .hero-actions,
-            .support-band .btn {
-                width: 100%;
-            }
-
-            .hero-actions .btn,
-            .support-band .btn {
-                width: 100%;
-            }
-
-            .support-actions {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .stats {
-                display: none;
-            }
-
-            .section {
-                padding: 64px 0;
-            }
-
-            .feature-card,
-            .download-top,
-            .install-card,
-            .steps-card,
-            .community-card,
-            .support-band {
-                padding: 20px;
-            }
-
-            .download-top {
-                grid-template-columns: 1fr;
-            }
-
-            .install-points {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                scroll-behavior: auto !important;
-                transition-duration: 0.001ms !important;
-                animation-duration: 0.001ms !important;
-                animation-iteration-count: 1 !important;
-            }
-
-            #networkCanvas {
-                display: none;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MDW DLC - Download</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #070910;
+      --panel: rgba(14, 19, 33, 0.86);
+      --panel-strong: rgba(18, 24, 40, 0.96);
+      --line: rgba(184, 197, 255, 0.13);
+      --text: #f4f7fb;
+      --muted: #9da9bd;
+      --muted-2: #68758a;
+      --cyan: #52d7ff;
+      --mint: #43f0b1;
+      --rose: #ff5f8f;
+      --amber: #ffc85a;
+      --violet: #8b73ff;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        linear-gradient(180deg, rgba(7, 9, 16, 0.86), var(--bg) 38%, #090b12 100%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 96px),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 96px);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(82, 215, 255, 0.16), transparent 32%),
+        radial-gradient(circle at 82% 20%, rgba(255, 95, 143, 0.13), transparent 34%),
+        radial-gradient(circle at 50% 100%, rgba(67, 240, 177, 0.08), transparent 44%);
+      pointer-events: none;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(
+        150px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+        rgba(82, 215, 255, 0.08),
+        rgba(255, 95, 143, 0.03) 34%,
+        transparent 70%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+
+    body.cursor-lit::after {
+      opacity: 0.46;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    #networkCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      opacity: 0.72;
+    }
+
+    .energy-ribbons {
+      position: absolute;
+      inset: -18% -12%;
+      overflow: hidden;
+      opacity: 0.72;
+      mix-blend-mode: screen;
+    }
+
+    .energy-ribbons span {
+      position: absolute;
+      left: -18%;
+      width: 140%;
+      height: 2px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.04), rgba(82, 215, 255, 0.55), rgba(255, 95, 143, 0.35), transparent);
+      filter: drop-shadow(0 0 16px rgba(82, 215, 255, 0.35));
+      transform: rotate(-18deg) translateX(-18%);
+      animation: ribbonDrift 7.4s ease-in-out infinite;
+    }
+
+    .energy-ribbons span:nth-child(1) { top: 24%; }
+    .energy-ribbons span:nth-child(2) {
+      top: 53%;
+      animation-delay: -2.3s;
+      animation-duration: 8.8s;
+      background: linear-gradient(90deg, transparent, rgba(67, 240, 177, 0.03), rgba(67, 240, 177, 0.44), rgba(139, 115, 255, 0.34), transparent);
+    }
+    .energy-ribbons span:nth-child(3) {
+      top: 78%;
+      animation-delay: -4.8s;
+      animation-duration: 10.2s;
+      background: linear-gradient(90deg, transparent, rgba(255, 200, 90, 0.03), rgba(255, 95, 143, 0.42), rgba(82, 215, 255, 0.32), transparent);
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7, 9, 16, 0.76);
+      backdrop-filter: blur(22px);
+    }
+
+    .nav {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: fit-content;
+      font-weight: 850;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(82, 215, 255, 0.48);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(82, 215, 255, 0.22), rgba(255, 95, 143, 0.12)),
+        rgba(255, 255, 255, 0.04);
+      box-shadow: 0 0 30px rgba(82, 215, 255, 0.2);
+      color: var(--cyan);
+      font-size: 13px;
+    }
+
+    .brand-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1;
+    }
+
+    .brand-copy strong {
+      font-size: 16px;
+    }
+
+    .brand-copy span {
+      color: var(--muted-2);
+      font-size: 11px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 8px;
+      padding: 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+      transition: color 180ms ease, background 180ms ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+    }
+
+    .nav-links .nav-download {
+      border: 1px solid rgba(82, 215, 255, 0.36);
+      background: rgba(82, 215, 255, 0.1);
+      color: var(--cyan);
+    }
+
+    .hero {
+      min-height: 84svh;
+      position: relative;
+      display: grid;
+      align-items: center;
+      padding: 136px 0 70px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 26px;
+      width: min(760px, 70vw);
+      height: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.42), rgba(255, 95, 143, 0.25), transparent);
+    }
+
+    .hero-asset {
+      position: absolute;
+      inset: 112px max(28px, calc((100vw - 1180px) / 2)) auto auto;
+      width: min(520px, 42vw);
+      height: 440px;
+      opacity: 0.78;
+      transform: rotateX(58deg) rotateZ(-22deg) translateY(-26px) translate3d(var(--hero-shift-x, 0px), var(--hero-shift-y, 0px), 0);
+      transform-origin: center;
+      filter: drop-shadow(0 32px 42px rgba(0, 0, 0, 0.5));
+      pointer-events: none;
+      transition: transform 120ms ease-out;
+    }
+
+    .launcher-map {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(82, 215, 255, 0.24);
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(82, 215, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(135deg, rgba(13, 18, 31, 0.94), rgba(20, 25, 39, 0.65));
+      background-size: 42px 42px, 42px 42px, 100% 100%;
+      overflow: hidden;
+    }
+
+    .launcher-map::before,
+    .launcher-map::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(82, 215, 255, 0.34);
+      border-radius: 8px;
+      background: rgba(7, 9, 16, 0.58);
+    }
+
+    .launcher-map::before {
+      inset: 36px 44px auto auto;
+      width: 220px;
+      height: 120px;
+    }
+
+    .launcher-map::after {
+      left: 52px;
+      bottom: 54px;
+      width: 290px;
+      height: 96px;
+      border-color: rgba(255, 200, 90, 0.34);
+    }
+
+    .map-scan {
+      position: absolute;
+      top: -20%;
+      bottom: -20%;
+      width: 68px;
+      left: -120px;
+      background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.22), transparent);
+      filter: blur(1px);
+      transform: skewX(-18deg);
+      animation: mapScan 6s ease-in-out infinite;
+    }
+
+    .map-line {
+      position: absolute;
+      height: 2px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--mint), transparent);
+      background-size: 240% 100%;
+      opacity: 0.78;
+      animation: linePulse 3.4s ease-in-out infinite;
+    }
+
+    .map-line.one {
+      left: 12%;
+      right: 18%;
+      top: 36%;
+      transform: rotate(-8deg);
+    }
+
+    .map-line.two {
+      left: 22%;
+      right: 10%;
+      top: 62%;
+      transform: rotate(12deg);
+      background: linear-gradient(90deg, transparent, var(--rose), var(--amber), transparent);
+      background-size: 240% 100%;
+      animation-delay: -1.2s;
+    }
+
+    .map-line.three {
+      left: 8%;
+      right: 34%;
+      top: 78%;
+      transform: rotate(-15deg);
+      animation-delay: -2s;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: min(880px, 100%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid rgba(82, 215, 255, 0.24);
+      border-radius: 8px;
+      background: rgba(82, 215, 255, 0.08);
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: var(--mint);
+      box-shadow: 0 0 18px var(--mint);
+      animation: betaPulse 2.4s ease-in-out infinite;
+    }
+
+    h1 {
+      margin-top: 24px;
+      max-width: 820px;
+      font-size: clamp(54px, 8vw, 112px);
+      line-height: 0.9;
+      font-weight: 920;
+    }
+
+    .text-gradient {
+      display: inline-block;
+      background: linear-gradient(100deg, var(--text), var(--cyan) 48%, var(--rose));
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: titleFlow 4.8s ease-in-out infinite;
+    }
+
+    .hero-chips {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-chip {
+      position: absolute;
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0 10px;
+      background: rgba(8, 12, 22, 0.5);
+      color: rgba(244, 247, 251, 0.68);
+      font-size: 12px;
+      font-weight: 850;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
+      animation: chipFloat 6.4s ease-in-out infinite;
+    }
+
+    .hero-chip:nth-child(1) { top: 18%; left: 5%; color: var(--mint); }
+    .hero-chip:nth-child(2) { top: 29%; right: 12%; color: var(--cyan); animation-delay: -1.5s; }
+    .hero-chip:nth-child(3) { left: 50%; bottom: 36%; color: var(--amber); animation-delay: -3s; }
+    .hero-chip:nth-child(4) { right: 5%; bottom: 30%; color: var(--rose); animation-delay: -4.5s; }
+
+    .hero-subtitle {
+      max-width: 690px;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 22px);
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-top: 36px;
+    }
+
+    .btn {
+      position: relative;
+      overflow: hidden;
+      min-height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 0 22px;
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 800;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #23b7ff, #8b73ff 54%, #ff5f8f);
+      box-shadow: 0 16px 44px rgba(82, 215, 255, 0.22);
+    }
+
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      inset: -1px auto -1px -45%;
+      width: 34%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
+      transform: skewX(-22deg);
+      animation: buttonSweep 4.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .btn-secondary {
+      border-color: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 54px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .stat {
+      min-height: 92px;
+      position: relative;
+      overflow: hidden;
+      padding: 18px;
+      background: rgba(13, 17, 29, 0.82);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted-2);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .section {
+      position: relative;
+      z-index: 1;
+      padding: 86px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 28px;
+    }
+
+    .section-kicker {
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      max-width: 720px;
+      margin-top: 10px;
+      font-size: clamp(34px, 4vw, 58px);
+      line-height: 1.02;
+      font-weight: 900;
+    }
+
+    .section-copy {
+      max-width: 430px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature-card,
+    .download-panel,
+    .community-card,
+    .support-band {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
+    }
+
+    .feature-card {
+      min-height: 260px;
+      padding: 26px;
+    }
+
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cyan), var(--mint), var(--rose));
+    }
+
+    .feature-index {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      margin-bottom: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0 10px;
+      color: var(--muted-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .feature-card h3 {
+      max-width: 280px;
+      margin-bottom: 14px;
+      font-size: 23px;
+      line-height: 1.18;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .download-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .download-panel {
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .download-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      padding: 30px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, rgba(82, 215, 255, 0.12), transparent 44%),
+        linear-gradient(135deg, rgba(255, 95, 143, 0.09), transparent 52%);
+    }
+
+    .download-top h2 {
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.02;
+    }
+
+    .download-top p {
+      max-width: 590px;
+      margin-top: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .release-badge {
+      align-self: start;
+      border: 1px solid rgba(67, 240, 177, 0.32);
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: rgba(67, 240, 177, 0.08);
+      color: var(--mint);
+      font-size: 13px;
+      font-weight: 850;
+      white-space: nowrap;
+      animation: badgeFloat 3.2s ease-in-out infinite;
+    }
+
+    .download-body {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .install-card,
+    .steps-card {
+      padding: 28px;
+      background: rgba(10, 14, 24, 0.84);
+    }
+
+    .install-card h3,
+    .steps-card h3,
+    .community-card h3 {
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+
+    .install-points {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 22px 0;
+    }
+
+    .install-point {
+      min-height: 88px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 8px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .install-point strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .install-point span {
+      color: var(--muted-2);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .steps-list {
+      display: grid;
+      gap: 12px;
+      counter-reset: steps;
+      list-style: none;
+    }
+
+    .steps-list li {
+      position: relative;
+      min-height: 48px;
+      padding-left: 52px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .steps-list li::before {
+      counter-increment: steps;
+      content: counter(steps, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(82, 215, 255, 0.28);
+      border-radius: 8px;
+      color: var(--cyan);
+      background: rgba(82, 215, 255, 0.07);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .status-wrap {
+      padding: 0 28px 28px;
+      background: rgba(10, 14, 24, 0.84);
+    }
+
+    .progress-bar {
+      display: none;
+      width: 100%;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--mint), var(--rose));
+      transition: width 260ms ease;
+    }
+
+    .status {
+      display: none;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      font-weight: 720;
+    }
+
+    .status.success {
+      border-color: rgba(67, 240, 177, 0.34);
+      color: #8cffd5;
+      background: rgba(67, 240, 177, 0.08);
+    }
+
+    .status.info {
+      border-color: rgba(82, 215, 255, 0.34);
+      color: #a7eaff;
+      background: rgba(82, 215, 255, 0.08);
+    }
+
+    .community-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .community-card {
+      display: grid;
+      gap: 14px;
+      padding: 24px;
+      background: var(--panel-strong);
+    }
+
+    .community-card span {
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .community-card p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .support-band {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .support-band p {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .support-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--line);
+      padding: 34px 0;
+      color: var(--muted-2);
+      background: rgba(5, 7, 12, 0.66);
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 14px;
+    }
+
+    .reveal {
+      opacity: 0.46;
+      transform: translateY(16px);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes betaPulse {
+      0%, 100% { opacity: 0.82; transform: scale(1); box-shadow: 0 0 14px rgba(67, 240, 177, 0.72); }
+      50% { opacity: 1; transform: scale(1.35); box-shadow: 0 0 24px rgba(67, 240, 177, 0.95); }
+    }
+
+    @keyframes buttonSweep {
+      0%, 58%, 100% { left: -45%; opacity: 0; }
+      68% { opacity: 0.9; }
+      86% { left: 112%; opacity: 0; }
+    }
+
+    @keyframes mapScan {
+      0%, 45%, 100% { left: -120px; opacity: 0; }
+      55% { opacity: 0.7; }
+      78% { left: calc(100% + 80px); opacity: 0; }
+    }
+
+    @keyframes badgeFloat {
+      0%, 100% { transform: translateY(0); border-color: rgba(67, 240, 177, 0.32); }
+      50% { transform: translateY(-3px); border-color: rgba(82, 215, 255, 0.44); }
+    }
+
+    @keyframes ribbonDrift {
+      0%, 100% { transform: rotate(-18deg) translateX(-22%); opacity: 0; }
+      16%, 78% { opacity: 1; }
+      58% { transform: rotate(-18deg) translateX(10%); }
+    }
+
+    @keyframes linePulse {
+      0%, 100% {
+        background-position: 0% 50%;
+        opacity: 0.42;
+        filter: drop-shadow(0 0 4px rgba(82, 215, 255, 0.18));
+      }
+      50% {
+        background-position: 100% 50%;
+        opacity: 0.95;
+        filter: drop-shadow(0 0 14px rgba(82, 215, 255, 0.5));
+      }
+    }
+
+    @keyframes titleFlow {
+      0%, 100% { background-position: 0% 50%; filter: drop-shadow(0 0 0 rgba(82, 215, 255, 0)); }
+      50% { background-position: 100% 50%; filter: drop-shadow(0 0 24px rgba(82, 215, 255, 0.22)); }
+    }
+
+    @keyframes chipFloat {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.44; }
+      50% { transform: translate3d(12px, -18px, 0) rotate(1.5deg); opacity: 0.9; }
+    }
+
+    @media (max-width: 980px) {
+      .nav-links a:not(.nav-download) {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 124px 0 60px;
+      }
+
+      .hero-asset {
+        inset: 104px 24px auto auto;
+        width: min(500px, 88vw);
+        height: 340px;
+        opacity: 0.32;
+      }
+
+      .stats,
+      .feature-grid,
+      .download-body,
+      .community-links {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head,
+      .support-band,
+      .footer-row {
+        align-items: start;
+        grid-template-columns: 1fr;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: calc(100% - 40px);
+      }
+
+      .nav {
+        height: 68px;
+        gap: 12px;
+      }
+
+      .brand-copy strong {
+        max-width: 92px;
+        overflow: hidden;
+        font-size: 14px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .brand-copy span {
+        display: none;
+      }
+
+      .nav-links {
+        flex: 0 0 auto;
+        margin-left: auto;
+      }
+
+      .nav-links .nav-download {
+        width: 50px;
+        min-width: 50px;
+        min-height: 38px;
+        overflow: hidden;
+        padding: 0;
+        color: transparent;
+        white-space: nowrap;
+      }
+
+      .nav-links .nav-download::after {
+        content: "EXE";
+        color: var(--cyan);
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .hero {
+        padding-top: 104px;
+      }
+
+      .hero-asset {
+        left: -36px;
+        right: -58px;
+        width: auto;
+        max-width: none;
+      }
+
+      .hero-chips,
+      .stats {
+        display: none;
+      }
+
+      h1 {
+        font-size: clamp(40px, 14vw, 56px);
+      }
+
+      .hero-subtitle {
+        max-width: 330px;
+        font-size: 16px;
+      }
+
+      .hero-actions,
+      .hero-actions .btn,
+      .support-actions,
+      .support-band .btn {
+        width: 100%;
+      }
+
+      .support-actions {
+        flex-direction: column;
+      }
+
+      .section {
+        padding: 64px 0;
+      }
+
+      .feature-card,
+      .download-top,
+      .install-card,
+      .steps-card,
+      .community-card,
+      .support-band {
+        padding: 20px;
+      }
+
+      .download-top,
+      .install-points {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+      }
+
+      #networkCanvas {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="scene" aria-hidden="true">
-        <div class="energy-ribbons">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <canvas id="networkCanvas"></canvas>
+  <div class="scene" aria-hidden="true">
+    <div class="energy-ribbons">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
+    <canvas id="networkCanvas"></canvas>
+  </div>
 
-    <header class="site-header">
-        <nav class="nav shell" aria-label="Главная навигация">
-            <a class="brand" href="#top" aria-label="MDW DLC">
-                <span class="brand-mark">MDW</span>
-                <span class="brand-copy">
-                    <strong>MDW DLC</strong>
-                    <span>Minecraft launcher</span>
-                </span>
-            </a>
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Главная навигация">
+      <a class="brand" href="#top" aria-label="MDW DLC">
+        <span class="brand-mark">MDW</span>
+        <span class="brand-copy">
+          <strong>MDW DLC</strong>
+          <span>Minecraft launcher</span>
+        </span>
+      </a>
 
-            <div class="nav-links">
-                <a href="#features">Возможности</a>
-                <a href="#download">Скачать</a>
-                <a href="#support">Поддержка</a>
-                <a class="social-link" href="https://t.me/mdwclient" target="_blank" rel="noopener">Telegram</a>
-                <a class="social-link" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">Discord</a>
-                <a class="nav-download" href="#download">Получить лаунчер</a>
-            </div>
-        </nav>
-    </header>
+      <div class="nav-links">
+        <a href="#features">Возможности</a>
+        <a href="#download">Скачать</a>
+        <a href="#support">Поддержка</a>
+        <a class="social-link" href="https://t.me/mdwclient" target="_blank" rel="noopener">Telegram</a>
+        <a class="social-link" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">Discord</a>
+        <a class="nav-download" href="#download">Получить лаунчер</a>
+      </div>
+    </nav>
+  </header>
 
-    <main id="top">
-        <section class="hero">
-            <div class="hero-chips" aria-hidden="true">
-                <span class="hero-chip">BETA ACCESS</span>
-                <span class="hero-chip">FABRIC 1.21.4</span>
-                <span class="hero-chip">AUTO SETUP</span>
-                <span class="hero-chip">MDW CLIENT</span>
-            </div>
+  <main id="top">
+    <section class="hero">
+      <div class="hero-chips" aria-hidden="true">
+        <span class="hero-chip">BETA ACCESS</span>
+        <span class="hero-chip">FABRIC 1.21.4</span>
+        <span class="hero-chip">AUTO SETUP</span>
+        <span class="hero-chip">MDW CLIENT</span>
+      </div>
 
-            <div class="hero-asset" aria-hidden="true">
-                <div class="launcher-map">
-                    <span class="map-scan"></span>
-                    <span class="map-line one"></span>
-                    <span class="map-line two"></span>
-                    <span class="map-line three"></span>
-                </div>
-            </div>
-
-            <div class="shell">
-                <div class="hero-content">
-                    <div class="eyebrow">Beta test • Подписанный лаунчер для MDW DLC</div>
-                    <h1 class="glitch-title" data-text="MDW DLC"><span class="text-gradient">MDW DLC</span></h1>
-                    <p class="hero-subtitle">
-                        Быстрый установщик для Minecraft 1.21.4: скачивает нужные файлы,
-                        помогает установить клиент и запускает игру без ручной сборки папок.
-                    </p>
-
-                    <div class="hero-actions">
-                        <button class="btn btn-primary" type="button" onclick="downloadLauncher()">Скачать EXE</button>
-                        <a class="btn btn-secondary" href="#features">Что внутри</a>
-                    </div>
-
-                    <div class="stats" aria-label="Информация о сборке">
-                        <div class="stat">
-                            <strong>1.21.4</strong>
-                            <span>Minecraft</span>
-                        </div>
-                        <div class="stat">
-                            <strong>0.16.14</strong>
-                            <span>Fabric Loader</span>
-                        </div>
-                        <div class="stat">
-                            <strong>EXE</strong>
-                            <span>Подписанный установщик</span>
-                        </div>
-                        <div class="stat">
-                            <strong>Beta</strong>
-                            <span>Test access</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section shell reveal" id="features">
-            <div class="section-head">
-                <div>
-                    <div class="section-kicker">Возможности</div>
-                    <h2 class="section-title">Сайт стал спокойнее, понятнее и быстрее ведет к скачиванию.</h2>
-                </div>
-                <p class="section-copy">
-                    На первом экране сразу видно, что это за проект, какая версия Minecraft нужна
-                    и какой файл скачивать. Остальное разложено по коротким блокам.
-                </p>
-            </div>
-
-            <div class="feature-grid">
-                <article class="feature-card cursor-card">
-                    <span class="feature-index">01</span>
-                    <h3>Один главный файл</h3>
-                    <p>Подписанный установщик скачивает нужные компоненты и не заставляет вручную раскладывать архивы.</p>
-                </article>
-
-                <article class="feature-card cursor-card">
-                    <span class="feature-index">02</span>
-                    <h3>Четкие шаги запуска</h3>
-                    <p>Инструкция теперь видна рядом с кнопкой скачивания: скачал, запустил, ввел ключ, установил, запустил игру.</p>
-                </article>
-
-                <article class="feature-card cursor-card">
-                    <span class="feature-index">03</span>
-                    <h3>Комьюнити и поддержка</h3>
-                    <p>Для новостей есть Telegram, а для помощи и вопросов по beta test открыт Discord-сервер MDW.</p>
-                </article>
-            </div>
-        </section>
-
-        <section class="section shell reveal" id="download">
-            <div class="download-wrap">
-                <div class="download-panel cursor-card">
-                    <div class="download-top">
-                        <div>
-                            <div class="section-kicker">Download</div>
-                            <h2>Скачать MDW DLC Launcher</h2>
-                            <p>
-                                Основной вариант для Windows. После запуска лаунчер сам подготовит
-                                окружение, скачает клиент и поможет стартовать Minecraft.
-                            </p>
-                        </div>
-                        <div class="release-badge">Beta test</div>
-                    </div>
-
-                    <div class="download-body">
-                        <div class="install-card">
-                            <h3>Основной установщик</h3>
-                            <button class="btn btn-primary" type="button" onclick="downloadLauncher()">Скачать MDWLauncher-Installer.exe</button>
-
-                            <div class="install-points">
-                                <div class="install-point cursor-card">
-                                    <strong>Цифровая подпись</strong>
-                                    <span>Windows понятнее, откуда файл и кто его выпустил.</span>
-                                </div>
-                                <div class="install-point cursor-card">
-                                    <strong>Java автоматически</strong>
-                                    <span>Если Java нет, лаунчер предложит загрузку при первом запуске.</span>
-                                </div>
-                                <div class="install-point cursor-card">
-                                    <strong>Быстрый старт</strong>
-                                    <span>Без ручной настройки Fabric и копирования файлов.</span>
-                                </div>
-                                <div class="install-point cursor-card">
-                                    <strong>Ключ лицензии</strong>
-                                    <span>Вводится уже внутри лаунчера перед установкой клиента.</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="steps-card">
-                            <h3>Как запустить</h3>
-                            <ol class="steps-list">
-                                <li>Скачай файл MDWLauncher-Installer.exe.</li>
-                                <li>Запусти установщик и подтверди запуск в Windows, если появится предупреждение.</li>
-                                <li>Введи лицензионный ключ в окне лаунчера.</li>
-                                <li>Нажми Download & Install, затем Launch Game.</li>
-                            </ol>
-                        </div>
-                    </div>
-
-                    <div class="status-wrap">
-                        <div class="progress-bar" id="progressBar" aria-hidden="true">
-                            <div class="progress-fill" id="progressFill"></div>
-                        </div>
-                        <div id="status" class="status" role="status" aria-live="polite"></div>
-                    </div>
-                </div>
-
-                <div class="community-links">
-                    <a class="community-card cursor-card" href="https://t.me/mdwclient" target="_blank" rel="noopener">
-                        <span>Telegram</span>
-                        <h3>Новости beta test</h3>
-                        <p>Канал MDW с обновлениями, объявлениями и важной информацией по клиенту.</p>
-                    </a>
-
-                    <a class="community-card cursor-card" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">
-                        <span>Discord</span>
-                        <h3>Поддержка и доступ</h3>
-                        <p>Сервер для вопросов по запуску, ключам, beta test и быстрым ответам от команды.</p>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section class="section shell reveal" id="support">
-            <div class="support-band cursor-card">
-                <div>
-                    <div class="section-kicker">Поддержка</div>
-                    <h2 class="section-title">Поддержка beta test теперь в Discord.</h2>
-                    <p>
-                        Заходи на сервер MDW, если нужна помощь с запуском, ключом,
-                        установкой лаунчера или доступом к beta test.
-                    </p>
-                </div>
-                <div class="support-actions">
-                    <a class="btn btn-primary" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">Discord support</a>
-                    <a class="btn btn-secondary" href="https://t.me/mdwclient" target="_blank" rel="noopener">Telegram</a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="shell footer-row">
-            <strong>MDW DLC</strong>
-            <span>2026 - Minecraft 1.21.4 - Fabric Loader 0.16.14</span>
+      <div class="hero-asset" aria-hidden="true">
+        <div class="launcher-map">
+          <span class="map-scan"></span>
+          <span class="map-line one"></span>
+          <span class="map-line two"></span>
+          <span class="map-line three"></span>
         </div>
-    </footer>
+      </div>
 
-    <script>
-        const canvas = document.getElementById('networkCanvas');
-        const ctx = canvas.getContext('2d');
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const particles = [];
-        const particleTotal = 64;
+      <div class="shell">
+        <div class="hero-content">
+          <div class="eyebrow">Beta test • MDW DLC Launcher</div>
+          <h1><span class="text-gradient">MDW DLC</span></h1>
+          <p class="hero-subtitle">
+            Быстрый установщик для Minecraft 1.21.4: скачивает нужные файлы,
+            помогает установить клиент и запускает игру без ручной сборки папок.
+          </p>
 
-        function resizeCanvas() {
-            const ratio = Math.min(window.devicePixelRatio || 1, 2);
-            canvas.width = Math.floor(window.innerWidth * ratio);
-            canvas.height = Math.floor(window.innerHeight * ratio);
-            canvas.style.width = window.innerWidth + 'px';
-            canvas.style.height = window.innerHeight + 'px';
-            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-        }
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://github.com/mdwclient/mdw-license-ap/releases/download/Dlc/MDWLauncher.exe" download="MDWLauncher.exe" onclick="showDownloadStatus()">Скачать EXE</a>
+            <a class="btn btn-secondary" href="#features">Что внутри</a>
+          </div>
 
-        class NodeParticle {
-            constructor() {
-                this.reset(true);
-            }
+          <div class="stats" aria-label="Информация о сборке">
+            <div class="stat">
+              <strong>1.21.4</strong>
+              <span>Minecraft</span>
+            </div>
+            <div class="stat">
+              <strong>0.16.14</strong>
+              <span>Fabric Loader</span>
+            </div>
+            <div class="stat">
+              <strong>EXE</strong>
+              <span>MDWLauncher.exe</span>
+            </div>
+            <div class="stat">
+              <strong>Beta</strong>
+              <span>Test access</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            reset(randomPosition) {
-                this.x = randomPosition ? Math.random() * window.innerWidth : -20;
-                this.y = Math.random() * window.innerHeight;
-                this.speed = 0.28 + Math.random() * 0.44;
-                this.size = 1 + Math.random() * 1.8;
-                this.alpha = 0.18 + Math.random() * 0.42;
-            }
+    <section class="section shell reveal" id="features">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Возможности</div>
+          <h2 class="section-title">Сайт стал спокойнее, понятнее и быстрее ведет к скачиванию.</h2>
+        </div>
+        <p class="section-copy">
+          На первом экране сразу видно, что это за проект, какая версия Minecraft нужна
+          и какой файл скачивать. Остальное разложено по коротким блокам.
+        </p>
+      </div>
 
-            update() {
-                this.x += this.speed;
-                this.y += Math.sin((this.x + this.y) * 0.006) * 0.22;
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span class="feature-index">01</span>
+          <h3>Один главный файл</h3>
+          <p>Лаунчер скачивает нужные компоненты и не заставляет вручную раскладывать архивы.</p>
+        </article>
 
-                if (this.x > window.innerWidth + 24) {
-                    this.reset(false);
-                }
-            }
+        <article class="feature-card">
+          <span class="feature-index">02</span>
+          <h3>Четкие шаги запуска</h3>
+          <p>Скачал, запустил, ввел ключ, установил, запустил игру.</p>
+        </article>
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(82, 215, 255, ${this.alpha})`;
-                ctx.fill();
-            }
-        }
+        <article class="feature-card">
+          <span class="feature-index">03</span>
+          <h3>Комьюнити и поддержка</h3>
+          <p>Для новостей есть Telegram, а для помощи и вопросов по beta test открыт Discord-сервер MDW.</p>
+        </article>
+      </div>
+    </section>
 
-        function drawNetwork() {
-            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    <section class="section shell reveal" id="download">
+      <div class="download-wrap">
+        <div class="download-panel">
+          <div class="download-top">
+            <div>
+              <div class="section-kicker">Download</div>
+              <h2>Скачать MDW DLC Launcher</h2>
+              <p>
+                Основной вариант для Windows. После запуска лаунчер сам подготовит
+                окружение, скачает клиент и поможет стартовать Minecraft.
+              </p>
+            </div>
+            <div class="release-badge">Beta test</div>
+          </div>
 
-            particles.forEach((particle, index) => {
-                particle.update();
-                particle.draw();
+          <div class="download-body">
+            <div class="install-card">
+              <h3>Основной файл</h3>
+              <a class="btn btn-primary" href="https://github.com/mdwclient/mdw-license-ap/releases/download/Dlc/MDWLauncher.exe" download="MDWLauncher.exe" onclick="showDownloadStatus()">Скачать MDWLauncher.exe</a>
 
-                for (let i = index + 1; i < particles.length; i++) {
-                    const other = particles[i];
-                    const distance = Math.hypot(particle.x - other.x, particle.y - other.y);
+              <div class="install-points">
+                <div class="install-point">
+                  <strong>MDWLauncher.exe</strong>
+                  <span>Файл скачивается напрямую из GitHub Releases.</span>
+                </div>
+                <div class="install-point">
+                  <strong>Java автоматически</strong>
+                  <span>Если Java нет, лаунчер поможет подготовить нужную версию.</span>
+                </div>
+                <div class="install-point">
+                  <strong>Быстрый старт</strong>
+                  <span>Без ручной настройки Fabric и копирования файлов.</span>
+                </div>
+                <div class="install-point">
+                  <strong>Ключ лицензии</strong>
+                  <span>Вводится уже внутри лаунчера перед установкой клиента.</span>
+                </div>
+              </div>
+            </div>
 
-                    if (distance < 132) {
-                        const opacity = (1 - distance / 132) * 0.16;
-                        ctx.beginPath();
-                        ctx.moveTo(particle.x, particle.y);
-                        ctx.lineTo(other.x, other.y);
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
-                    }
-                }
-            });
+            <div class="steps-card">
+              <h3>Как запустить</h3>
+              <ol class="steps-list">
+                <li>Скачай файл MDWLauncher.exe.</li>
+                <li>Запусти файл и подтверди запуск в Windows, если появится предупреждение.</li>
+                <li>Введи лицензионный ключ в окне лаунчера.</li>
+                <li>Нажми Download & Install, затем Launch Game.</li>
+              </ol>
+            </div>
+          </div>
 
-            requestAnimationFrame(drawNetwork);
-        }
+          <div class="status-wrap">
+            <div class="progress-bar" id="progressBar" aria-hidden="true">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="status" class="status" role="status" aria-live="polite"></div>
+          </div>
+        </div>
 
-        if (!prefersReducedMotion.matches) {
-            resizeCanvas();
-            for (let i = 0; i < particleTotal; i++) {
-                particles.push(new NodeParticle());
-            }
-            drawNetwork();
-            window.addEventListener('resize', resizeCanvas);
-        }
+        <div class="community-links">
+          <a class="community-card" href="https://t.me/mdwclient" target="_blank" rel="noopener">
+            <span>Telegram</span>
+            <h3>Новости beta test</h3>
+            <p>Канал MDW с обновлениями, объявлениями и важной информацией по клиенту.</p>
+          </a>
 
-        const revealElements = document.querySelectorAll('.reveal');
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, { threshold: 0.14 });
+          <a class="community-card" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">
+            <span>Discord</span>
+            <h3>Поддержка и доступ</h3>
+            <p>Сервер для вопросов по запуску, ключам, beta test и быстрым ответам от команды.</p>
+          </a>
+        </div>
+      </div>
+    </section>
 
-        revealElements.forEach((element) => revealObserver.observe(element));
+    <section class="section shell reveal" id="support">
+      <div class="support-band">
+        <div>
+          <div class="section-kicker">Поддержка</div>
+          <h2 class="section-title">Поддержка beta test теперь в Discord.</h2>
+          <p>
+            Заходи на сервер MDW, если нужна помощь с запуском, ключом,
+            установкой лаунчера или доступом к beta test.
+          </p>
+        </div>
+        <div class="support-actions">
+          <a class="btn btn-primary" href="https://discord.gg/GUuQBXpwSD" target="_blank" rel="noopener">Discord support</a>
+          <a class="btn btn-secondary" href="https://t.me/mdwclient" target="_blank" rel="noopener">Telegram</a>
+        </div>
+      </div>
+    </section>
+  </main>
 
-        const setCursorPosition = (event) => {
-            if (cursorAnimationFrame) {
-                cancelAnimationFrame(cursorAnimationFrame);
-            }
+  <footer>
+    <div class="shell footer-row">
+      <strong>MDW DLC</strong>
+      <span>2026 - Minecraft 1.21.4 - Fabric Loader 0.16.14</span>
+    </div>
+  </footer>
 
-            cursorAnimationFrame = requestAnimationFrame(() => {
-                const x = event.clientX;
-                const y = event.clientY;
-                const shiftX = ((x / window.innerWidth) - 0.5) * -10;
-                const shiftY = ((y / window.innerHeight) - 0.5) * -8;
+  <script>
+    const canvas = document.getElementById('networkCanvas');
+    const ctx = canvas.getContext('2d');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const particles = [];
+    const particleTotal = 64;
 
-                document.documentElement.style.setProperty('--cursor-x', x + 'px');
-                document.documentElement.style.setProperty('--cursor-y', y + 'px');
-                document.documentElement.style.setProperty('--hero-shift-x', shiftX.toFixed(2) + 'px');
-                document.documentElement.style.setProperty('--hero-shift-y', shiftY.toFixed(2) + 'px');
-            });
-        };
-
-        let cursorAnimationFrame = null;
-        document.addEventListener('pointermove', setCursorPosition);
-
-        document.addEventListener('pointerover', (event) => {
-            if (event.target.closest('.cursor-card')) {
-                document.body.classList.add('cursor-lit');
-                setCursorPosition(event);
-            }
-        });
-
-        document.addEventListener('pointerout', (event) => {
-            const nextTarget = event.relatedTarget;
-            if (!(nextTarget instanceof Element) || !nextTarget.closest('.cursor-card')) {
-                document.body.classList.remove('cursor-lit');
-            }
-        });
-
-        document.querySelectorAll('.cursor-card').forEach((card) => {
-            card.addEventListener('pointermove', (event) => {
-                const rect = card.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                const centerX = x / rect.width - 0.5;
-                const centerY = y / rect.height - 0.5;
-
-                card.style.setProperty('--spot-x', x + 'px');
-                card.style.setProperty('--spot-y', y + 'px');
-                card.style.setProperty('--card-rx', (-centerY * 4).toFixed(2) + 'deg');
-                card.style.setProperty('--card-ry', (centerX * 5).toFixed(2) + 'deg');
-            });
-
-            card.addEventListener('pointerleave', () => {
-                card.style.setProperty('--card-rx', '0deg');
-                card.style.setProperty('--card-ry', '0deg');
-            });
-        });
-
-        document.querySelectorAll('.btn').forEach((button) => {
-            button.addEventListener('pointermove', (event) => {
-                const rect = button.getBoundingClientRect();
-                button.style.setProperty('--btn-x', (event.clientX - rect.left) + 'px');
-                button.style.setProperty('--btn-y', (event.clientY - rect.top) + 'px');
-            });
-        });
-
-        const sparkColors = ['#52d7ff', '#43f0b1', '#ff5f8f', '#ffc85a', '#8b73ff'];
-        document.addEventListener('pointerdown', (event) => {
-            if (prefersReducedMotion.matches) {
-                return;
-            }
-
-            for (let i = 0; i < 9; i++) {
-                const spark = document.createElement('span');
-                const angle = (Math.PI * 2 * i / 9) + Math.random() * 0.5;
-                const distance = 22 + Math.random() * 34;
-
-                spark.className = 'click-spark';
-                spark.style.setProperty('--spark-left', event.clientX + 'px');
-                spark.style.setProperty('--spark-top', event.clientY + 'px');
-                spark.style.setProperty('--spark-x', Math.cos(angle) * distance + 'px');
-                spark.style.setProperty('--spark-y', Math.sin(angle) * distance + 'px');
-                spark.style.setProperty('--spark-color', sparkColors[i % sparkColors.length]);
-                document.body.appendChild(spark);
-                spark.addEventListener('animationend', () => spark.remove(), { once: true });
-            }
-        });
-
-        const downloads = {
-    launcher: {
-        url: 'https://github.com/mdwclient/mdw-license-ap/releases/download/Dlc/MDWLauncher.exe',
-        filename: 'MDWLauncher.exe',
-        start: 'Загружаю MDW Launcher...',
-        done: 'Готово. Запусти MDWLauncher.exe.'
+    function resizeCanvas() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(window.innerWidth * ratio);
+      canvas.height = Math.floor(window.innerHeight * ratio);
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     }
-};
 
-        async function downloadLauncher() {
-            await downloadFile(downloads.launcher);
+    class NodeParticle {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(randomPosition) {
+        this.x = randomPosition ? Math.random() * window.innerWidth : -20;
+        this.y = Math.random() * window.innerHeight;
+        this.speed = 0.28 + Math.random() * 0.44;
+        this.size = 1 + Math.random() * 1.8;
+        this.alpha = 0.18 + Math.random() * 0.42;
+      }
+
+      update() {
+        this.x += this.speed;
+        this.y += Math.sin((this.x + this.y) * 0.006) * 0.22;
+        if (this.x > window.innerWidth + 24) {
+          this.reset(false);
         }
+      }
 
-        async function downloadFile(file) {
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
-            const buttons = document.querySelectorAll('button');
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(82, 215, 255, ${this.alpha})`;
+        ctx.fill();
+      }
+    }
 
-            buttons.forEach((button) => {
-                button.disabled = true;
-            });
-            progressBar.style.display = 'block';
-            progressFill.style.width = '24%';
+    function drawNetwork() {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-            try {
-                showStatus(file.start, 'info');
-                await sleep(180);
-                progressFill.style.width = '58%';
+      particles.forEach((particle, index) => {
+        particle.update();
+        particle.draw();
 
-                const response = await fetch(file.url);
-                if (!response.ok) {
-                    throw new Error('сервер вернул ошибку ' + response.status);
-                }
+        for (let i = index + 1; i < particles.length; i++) {
+          const other = particles[i];
+          const distance = Math.hypot(particle.x - other.x, particle.y - other.y);
 
-                progressFill.style.width = '84%';
-                const blob = await response.blob();
-                const objectUrl = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-
-                link.href = objectUrl;
-                link.download = file.filename;
-                document.body.appendChild(link);
-                link.click();
-                window.URL.revokeObjectURL(objectUrl);
-                document.body.removeChild(link);
-
-                progressFill.style.width = '100%';
-                showStatus(file.done, 'success');
-
-                setTimeout(() => {
-                    progressBar.style.display = 'none';
-                    progressFill.style.width = '0%';
-                }, 4200);
-            } catch (error) {
-                console.error('Download error:', error);
-                showStatus('Ошибка загрузки: ' + error.message, 'error');
-                progressBar.style.display = 'none';
-                progressFill.style.width = '0%';
-            } finally {
-                buttons.forEach((button) => {
-                    button.disabled = false;
-                });
-            }
+          if (distance < 132) {
+            const opacity = (1 - distance / 132) * 0.16;
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
         }
+      });
 
-        function showStatus(message, type) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = 'status ' + type;
-            status.style.display = 'block';
-        }
+      requestAnimationFrame(drawNetwork);
+    }
 
-        function sleep(ms) {
-            return new Promise((resolve) => setTimeout(resolve, ms));
+    if (!prefersReducedMotion.matches) {
+      resizeCanvas();
+      for (let i = 0; i < particleTotal; i++) {
+        particles.push(new NodeParticle());
+      }
+      drawNetwork();
+      window.addEventListener('resize', resizeCanvas);
+    }
+
+    const revealElements = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
         }
-    </script>
+      });
+    }, { threshold: 0.14 });
+
+    revealElements.forEach((element) => revealObserver.observe(element));
+
+    let cursorAnimationFrame = null;
+
+    document.addEventListener('pointermove', (event) => {
+      if (cursorAnimationFrame) {
+        cancelAnimationFrame(cursorAnimationFrame);
+      }
+
+      cursorAnimationFrame = requestAnimationFrame(() => {
+        const x = event.clientX;
+        const y = event.clientY;
+        const shiftX = ((x / window.innerWidth) - 0.5) * -10;
+        const shiftY = ((y / window.innerHeight) - 0.5) * -8;
+
+        document.documentElement.style.setProperty('--cursor-x', x + 'px');
+        document.documentElement.style.setProperty('--cursor-y', y + 'px');
+        document.documentElement.style.setProperty('--hero-shift-x', shiftX.toFixed(2) + 'px');
+        document.documentElement.style.setProperty('--hero-shift-y', shiftY.toFixed(2) + 'px');
+      });
+    });
+
+    document.addEventListener('pointerover', (event) => {
+      if (event.target.closest('.feature-card, .download-panel, .community-card, .support-band, .btn')) {
+        document.body.classList.add('cursor-lit');
+      }
+    });
+
+    document.addEventListener('pointerout', (event) => {
+      const nextTarget = event.relatedTarget;
+      if (!(nextTarget instanceof Element) || !nextTarget.closest('.feature-card, .download-panel, .community-card, .support-band, .btn')) {
+        document.body.classList.remove('cursor-lit');
+      }
+    });
+
+    function showDownloadStatus() {
+      const progressBar = document.getElementById('progressBar');
+      const progressFill = document.getElementById('progressFill');
+      const status = document.getElementById('status');
+
+      progressBar.style.display = 'block';
+      progressFill.style.width = '35%';
+      status.textContent = 'Начинаю загрузку MDWLauncher.exe...';
+      status.className = 'status info';
+      status.style.display = 'block';
+
+      setTimeout(() => {
+        progressFill.style.width = '100%';
+        status.textContent = 'Готово. Если скачивание не началось, браузер мог заблокировать popup — нажми кнопку ещё раз.';
+        status.className = 'status success';
+      }, 700);
+
+      setTimeout(() => {
+        progressBar.style.display = 'none';
+        progressFill.style.width = '0%';
+      }, 4200);
+    }
+  </script>
 </body>
 </html>
