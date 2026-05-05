@@ -63,13 +63,18 @@
             inset: 0;
             z-index: -1;
             background: radial-gradient(
-                190px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
-                rgba(82, 215, 255, 0.07),
-                rgba(255, 95, 143, 0.025) 36%,
+                150px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+                rgba(82, 215, 255, 0.08),
+                rgba(255, 95, 143, 0.03) 34%,
                 transparent 70%
             );
-            opacity: 0.58;
+            opacity: 0;
             pointer-events: none;
+            transition: opacity 180ms ease;
+        }
+
+        body.cursor-lit::after {
+            opacity: 0.46;
         }
 
         a {
@@ -1750,8 +1755,7 @@
 
         revealElements.forEach((element) => revealObserver.observe(element));
 
-        let cursorAnimationFrame = null;
-        document.addEventListener('pointermove', (event) => {
+        const setCursorPosition = (event) => {
             if (cursorAnimationFrame) {
                 cancelAnimationFrame(cursorAnimationFrame);
             }
@@ -1767,6 +1771,23 @@
                 document.documentElement.style.setProperty('--hero-shift-x', shiftX.toFixed(2) + 'px');
                 document.documentElement.style.setProperty('--hero-shift-y', shiftY.toFixed(2) + 'px');
             });
+        };
+
+        let cursorAnimationFrame = null;
+        document.addEventListener('pointermove', setCursorPosition);
+
+        document.addEventListener('pointerover', (event) => {
+            if (event.target.closest('.cursor-card')) {
+                document.body.classList.add('cursor-lit');
+                setCursorPosition(event);
+            }
+        });
+
+        document.addEventListener('pointerout', (event) => {
+            const nextTarget = event.relatedTarget;
+            if (!(nextTarget instanceof Element) || !nextTarget.closest('.cursor-card')) {
+                document.body.classList.remove('cursor-lit');
+            }
         });
 
         document.querySelectorAll('.cursor-card').forEach((card) => {
