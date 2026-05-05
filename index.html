@@ -1841,13 +1841,13 @@
         });
 
         const downloads = {
-            launcher: {
-                url: 'https://license-production-d47b.up.railway.app/api/launcher/exe',
-                filename: 'MDWLauncher-Installer.exe',
-                start: 'Загружаю подписанный лаунчер...',
-                done: 'Готово. Запусти MDWLauncher-Installer.exe.'
-            }
-        };
+    launcher: {
+        url: 'https://github.com/mdwclient/mdw-license-ap/releases/download/Dlc/MDWLauncher.exe',
+        filename: 'MDWLauncher.exe',
+        start: 'Загружаю MDW Launcher...',
+        done: 'Готово. Запусти MDWLauncher.exe.'
+    }
+};
 
         async function downloadLauncher() {
             await downloadFile(downloads.launcher);
