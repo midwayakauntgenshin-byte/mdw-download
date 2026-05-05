@@ -63,12 +63,12 @@
             inset: 0;
             z-index: -1;
             background: radial-gradient(
-                420px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
-                rgba(82, 215, 255, 0.14),
-                rgba(255, 95, 143, 0.06) 34%,
+                190px circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+                rgba(82, 215, 255, 0.07),
+                rgba(255, 95, 143, 0.025) 36%,
                 transparent 70%
             );
-            opacity: 0.92;
+            opacity: 0.58;
             pointer-events: none;
         }
 
@@ -239,6 +239,18 @@
             overflow: hidden;
         }
 
+        .map-scan {
+            position: absolute;
+            top: -20%;
+            bottom: -20%;
+            width: 68px;
+            left: -120px;
+            background: linear-gradient(90deg, transparent, rgba(82, 215, 255, 0.22), transparent);
+            filter: blur(1px);
+            transform: skewX(-18deg);
+            animation: mapScan 6s ease-in-out infinite;
+        }
+
         .launcher-map::before,
         .launcher-map::after {
             content: "";
@@ -319,6 +331,7 @@
             border-radius: 99px;
             background: var(--mint);
             box-shadow: 0 0 18px var(--mint);
+            animation: betaPulse 2.4s ease-in-out infinite;
         }
 
         h1 {
@@ -355,6 +368,8 @@
         }
 
         .btn {
+            position: relative;
+            overflow: hidden;
             min-height: 52px;
             display: inline-flex;
             align-items: center;
@@ -396,9 +411,9 @@
             z-index: 1;
             border-radius: inherit;
             background: radial-gradient(
-                260px circle at var(--spot-x) var(--spot-y),
-                rgba(82, 215, 255, 0.18),
-                rgba(67, 240, 177, 0.08) 34%,
+                145px circle at var(--spot-x) var(--spot-y),
+                rgba(82, 215, 255, 0.09),
+                rgba(67, 240, 177, 0.035) 34%,
                 transparent 68%
             );
             opacity: 0;
@@ -407,12 +422,23 @@
         }
 
         .cursor-card:hover::after {
-            opacity: 1;
+            opacity: 0.72;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #23b7ff, #8b73ff 54%, #ff5f8f);
             box-shadow: 0 16px 44px rgba(82, 215, 255, 0.22);
+        }
+
+        .btn-primary::after {
+            content: "";
+            position: absolute;
+            inset: -1px auto -1px -45%;
+            width: 34%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
+            transform: skewX(-22deg);
+            animation: buttonSweep 4.8s ease-in-out infinite;
+            pointer-events: none;
         }
 
         .btn-primary:hover:not(:disabled) {
@@ -621,6 +647,65 @@
             font-size: 13px;
             font-weight: 850;
             white-space: nowrap;
+            animation: badgeFloat 3.2s ease-in-out infinite;
+        }
+
+        @keyframes betaPulse {
+            0%, 100% {
+                opacity: 0.82;
+                transform: scale(1);
+                box-shadow: 0 0 14px rgba(67, 240, 177, 0.72);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.35);
+                box-shadow: 0 0 24px rgba(67, 240, 177, 0.95);
+            }
+        }
+
+        @keyframes buttonSweep {
+            0%, 58%, 100% {
+                left: -45%;
+                opacity: 0;
+            }
+
+            68% {
+                opacity: 0.9;
+            }
+
+            86% {
+                left: 112%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes mapScan {
+            0%, 45%, 100% {
+                left: -120px;
+                opacity: 0;
+            }
+
+            55% {
+                opacity: 0.7;
+            }
+
+            78% {
+                left: calc(100% + 80px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes badgeFloat {
+            0%, 100% {
+                transform: translateY(0);
+                border-color: rgba(67, 240, 177, 0.32);
+            }
+
+            50% {
+                transform: translateY(-3px);
+                border-color: rgba(82, 215, 255, 0.44);
+            }
         }
 
         .download-body {
@@ -1032,6 +1117,7 @@
         <section class="hero">
             <div class="hero-asset" aria-hidden="true">
                 <div class="launcher-map">
+                    <span class="map-scan"></span>
                     <span class="map-line one"></span>
                     <span class="map-line two"></span>
                     <span class="map-line three"></span>
@@ -1308,8 +1394,8 @@
             cursorAnimationFrame = requestAnimationFrame(() => {
                 const x = event.clientX;
                 const y = event.clientY;
-                const shiftX = ((x / window.innerWidth) - 0.5) * -18;
-                const shiftY = ((y / window.innerHeight) - 0.5) * -14;
+                const shiftX = ((x / window.innerWidth) - 0.5) * -10;
+                const shiftY = ((y / window.innerHeight) - 0.5) * -8;
 
                 document.documentElement.style.setProperty('--cursor-x', x + 'px');
                 document.documentElement.style.setProperty('--cursor-y', y + 'px');
